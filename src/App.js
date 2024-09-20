@@ -1,48 +1,40 @@
 // src/App.js
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import axios from 'axios';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import InstanceTable from './InstanceTable';
-import InstanceDetails from './InstanceDetails';
-import {fetchTrackedEntityInstancesAndOrgUnits} from './api';
+
+
+import TrackedEntitiesTable from 'mark/jsx/TrackedEntitiesTable';
+import TrackedEntityDetails from 'mark/jsx/TrackedEntityDetails';
+import tracker from 'mark/api/tracker';
+
+
+axios.defaults.baseURL = 'http://localhost:8080/dhis2-stable-40.4.1';
+
+axios.defaults.headers.common['Authorization'] = 'Basic ' + btoa('admin:district');
+axios.defaults.headers.common['Accept'] = "application/json";
+
+const orgUnits = ["yApOnywci25", "Q6qNTXu3yRx","GuJvMV22ihs"];
+
+tracker.useLegacyTrackerApi = true;
+
+
+
 
 
 
 const App = () => {
-  const [data, setData] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      const instances = await fetchTrackedEntityInstancesAndOrgUnits();
-          setData(instances.trackedEntityInstances);
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { trackedEntityInstances } = await fetchTrackedEntityInstancesAndOrgUnits();
-        setData(trackedEntityInstances); // Set the combined instances data
-      } catch (err) {
-        console.error(err);
-      }
-    };
-  
-    fetchData();
-  }, []);
-  
-
-
-return (
-  <Router>
-    <Routes>
-      {/* Route to show InstanceTable with data */}
-      <Route path="/" element={<InstanceTable data={data} />} />
-      
-      {/* Route for details page */}
-      <Route path="/instanceDetails/:id" element={<InstanceDetails />} />
-    </Routes>
-  </Router>
-);
+  return (
+    <Router>
+      <Routes>
+        {/* Route to show TrackedEntitiesTable with data */}
+        <Route path="/" element={<TrackedEntitiesTable orgUnits = {orgUnits} trackedEntityType="MCPQUTHX1Ze"/>} />
+        
+        {/* Route for details page */}
+        <Route path="/instanceDetails/" element={<TrackedEntityDetails />} />
+      </Routes>
+    </Router>
+  );
 };
 
 export default App;

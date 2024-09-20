@@ -19,7 +19,7 @@ export const fetchTrackedEntityInstancesAndOrgUnits = async () => {
             paging: false,
             fields: '*',
             trackedEntityType: 'MCPQUTHX1Ze',
-            
+            //program: 'wfd9K4dQVDR',
             ou: orgUnitId, // Dynamic org unit ID
           },
           headers: {
@@ -62,66 +62,23 @@ fetchTrackedEntityInstancesAndOrgUnits()
 
 
 // Function to fetch DHIS2 events and data elements with their values
-export const fetchDHIS2Events = async () => {
-  const orgUnits = ['Q6qNTXu3yRx', 'GuJvMV22ihs', 'yApOnywci25'];
-  
+
+export const fetchInstanceDetails = async (trackedEntityInstanceId) => {
   try {
-    const allResponses = await Promise.all(
-      orgUnits.map(async (orgUnitId) => {
-        const response = await axios.get(`http://localhost:8080/dhis2-stable-40.4.1/api/tracker/events.json`, {
-          params: {
-            paging: false,
-            fields: '*',
-            program: 'wfd9K4dQVDR',
-            ou: orgUnitId,
-          },
-          headers: {
-            Authorization: 'Basic ' + btoa('admin:district'), // Replace with actual credentials
-          },
-        });
-
-        const instances = response.data.instances || []; // Ensure events exist
-
-        // Format the events and their associated data values for display
-        const formattedInstances = instances.map(instance => ({
-          eventId: instance.event,
-          programStage: instance.programStage,
-          orgUnit: instance.orgUnit,
-          orgUnitName: instance.orgUnitName,
-          eventDate: instance.eventDate,
-          trackedEntityInstance: instance.trackedEntity,
-          status: instance.status,
-          dataValues: instance.dataValues ? instance.dataValues.map(dataValue => ({
-            dataElementId: dataValue.dataElement,
-            value: dataValue.value,
-          })) : [],
-        }));
-
-        return formattedInstances; // Returns formatted events for the specific org unit
-      })
-    );
-
-    // Flatten the array if you want all events in a single array
-    return allResponses.flat(); // Use flat() if needed to merge arrays
-
+    const response = await axios.get(`http://localhost:8080/dhis2-stable-40.4.1/api/trackedEnityInstances/${trackedEntityInstanceId}.json?fields=enrollments[events]`, {
+      
+      headers: {
+        Authorization: 'Basic ' + btoa('admin:district'), // Replace with actual credentials
+      },
+    });
+    return response.data;
   } catch (error) {
-    console.error('Error fetching DHIS2 events:', error);
-    return [];
+    console.error('Fetch error:', error);
+    throw error; // Rethrow the error for handling in the calling component
   }
 };
+window.fetchInstanceDetails = fetchInstanceDetails;
 
-// src/api.js
-
-
-// Example function to fetch instance details
-export const fetchInstanceDetails = async (instanceId) => {
-  try {
-    const response = await axios.get(`/api/instance-details/${instanceId}`);
-    return response.data; // Return the fetched data
-  } catch (error) {
-    throw error; // Propagate the error for handling in the component
-  }
-};
 
 // Add other functions for different API calls as needed
 

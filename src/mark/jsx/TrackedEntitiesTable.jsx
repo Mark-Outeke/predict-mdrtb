@@ -1,65 +1,152 @@
-// src/components/InstanceTable.js
 import React, { useState, useEffect } from 'react';
 import { useTable, useSortBy, usePagination } from 'react-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { fetchTrackedEntityInstancesAndOrgUnits } from './api';
+import tracker from 'mark/api/tracker';
+import organisationUnits from 'mark/api/organisationUnits';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
-// InstanceTable component
-const InstanceTable = () => {
-  const [instances, setInstances] = useState([]);
-  //const [orgUnits, setOrgUnits] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
-  const navigate = useNavigate(); // Initialize navigate object
+
+
+
+
+const TrackedEntitiesTable = (props) => {
+
+  const [trackedEntities, setInstances] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [orgUnitDetails, setOrgUnitDetails] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true); // Set loading state to true before fetching
-      try {
-        const fetchedData = await fetchTrackedEntityInstancesAndOrgUnits('MCPQUTHX1Ze');
-        setInstances(fetchedData.trackedEntityInstances);
-        //setOrgUnits(fetchedData.allOrgUnits);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      } finally {
-        setIsLoading(false); // Set loading state to false after fetching
+
+
+    const getTrackedEntities = async ()=>{
+
+      let details = {
+        paging: false,
+        trackedEntityType: props.trackedEntityType,
+      };
+
+      if(tracker.useLegacyTrackerApi)
+      {
+        details.ou = props.orgUnits.toString().replaceAll(',', ';');
+        details.skipPaging = "true";
+
+        return tracker.legacy.GetTrackedEntities(details)
+
+      }else
+      {
+        details.orgUnits = props.orgUnits.toString();
+        return tracker.GetTrackedEntities(details)
       }
-    };
+    }
 
-    fetchData();
-  }, []);
 
+
+
+    getTrackedEntities()
+    .then((httpResponse)=>{
+
+      if(tracker.useLegacyTrackerApi)
+      {
+        setInstances(httpResponse.data.trackedEntityInstances);
+
+      }else
+      {
+        setInstances(httpResponse.data.trackedEntities);
+      }
+
+    }).catch ((error) => {
+      console.error("Error fetching data: ", error);
+    }).finally(()=> {
+      setIsLoading(false);
+    })
+
+    const filter = 'id:in:[' + props.orgUnits.toString() + ']';
+
+    organisationUnits.GetOrganisationUnits({
+      paging: "false",
+      filter,
+      fields:"id,name,displayName,code",
+    }).then((httpResponse)=>{
+
+    setOrgUnitDetails(httpResponse.data.organisationUnits);
+
+    }).catch((error)=>{
+      console.error("Error fetching data: ", error);
+
+    }).finally(()=>{
+    })
+      
+  }, [props.orgUnits, props.trackedEntityType]);
+
+
+  
+
+  
   // Prepare data for react-table from attributes
   const data = React.useMemo(() => (
-    instances.map(instance => {
+    
+    trackedEntities.map(trackedEntity => {
       const attributesObject = {};
-      instance.attributes.forEach(attr => {
+      trackedEntity.attributes.forEach(attr => {
         attributesObject[attr.displayName] = attr.value; // Use displayName as key
       });
 
+
+
+      const getOrgUnitDisplayNameByID = (orgUnitID)=>{
+        for(const orgUnitDetail of orgUnitDetails)
+        {
+          if(orgUnitDetail.id === orgUnitID)
+          {
+            return orgUnitDetail.displayName;
+          }
+        }
+  
+        return "Unknown";
+  
+      };
+
       return {
-        orgUnit: instance.orgUnit,
+        orgUnit: getOrgUnitDisplayNameByID(trackedEntity.orgUnit),
         ...attributesObject // Spread the attributes object into the return object
       };
     })
-  ), [instances]);
+  ), [trackedEntities, orgUnitDetails]);
+
+
+
+
+
+
+
+
+
+
 
   // Define columns based on displayNames dynamically
   const columns = React.useMemo(() => {
-    if (instances.length && instances[0].attributes) {
-      const attributeColumns = instances[0].attributes.map(attr => ({
-        Header: attr.displayName,
-        accessor: attr.displayName, // Use displayName as the accessor
+    if (trackedEntities.length && trackedEntities[0].attributes) {
+      const attributeColumns = trackedEntities[0].attributes.map(attr => ({
+            Header: attr.displayName,
+            accessor: attr.displayName, // Use displayName as the accessor
       }));
       return [
         { Header: 'Org Unit', accessor: 'orgUnit' },
-        {Header: 'Age', accessor:'NTLP-02: Age in years'},
-        {Header: 'Address', accessor:'Home Address'},
         ...attributeColumns
       ];
     }
-    return []; // Return empty if no instances available
-  }, [instances]);
+    return []; // Return empty if no trackedEntities available
+  }, [trackedEntities]);
+
+
+
+
+
+
+
+
 
   // Use react-table with pagination
   const {
@@ -80,11 +167,19 @@ const InstanceTable = () => {
     {
       columns,
       data,
-      initialState: { pageSize: 5 }, // Set initial page size
+      initialState: { pageSize: 50 }, // Set initial page size
     },
     useSortBy,
     usePagination // Add usePagination to enable pagination
   );
+
+
+
+
+
+
+
+
 
   // Render loading state
   if (isLoading) {
@@ -93,11 +188,11 @@ const InstanceTable = () => {
 
   // Handle row click to navigate to InstanceDetails
   const handleRowClick = (row) => {
-    navigate('/InstanceDetails', {
+    console.log(trackedEntities[row.index]);
+
+    navigate('/instanceDetails', {
       state: {
-        instance: instances[row.index], // Pass the clicked instance
-        trackedEntityInstance: instances[row.index].trackedEntityInstance,
-        //events: fetchEventsForInstance(instances[row.index].id), // Uncomment and implement if needed
+        trackedEntity: trackedEntities[row.index]
       },
     });
   };
@@ -170,4 +265,4 @@ const InstanceTable = () => {
   );
 };
 
-export default InstanceTable;
+export default TrackedEntitiesTable;
