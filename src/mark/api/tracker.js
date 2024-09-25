@@ -42,6 +42,9 @@ const tracker = {
         GetEnrollments : async (details)=>{
             return axios.get('/api/enrollments', {params: details});
         },
+        GetDataElementsNameByID : async (details)=>{
+            return axios.get ('/api/dataElements', {params:details});
+        }
     },
 
 

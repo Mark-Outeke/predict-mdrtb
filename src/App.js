@@ -3,9 +3,10 @@ import React from 'react';
 import axios from 'axios';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-
+import { TrackedEntityProvider } from 'TrackedEntityContext'; // Import the context provider
 import TrackedEntitiesTable from 'mark/jsx/TrackedEntitiesTable';
 import TrackedEntityDetails from 'mark/jsx/TrackedEntityDetails';
+import PredictionComponent from 'predictionProcessor'; // Import the prediction component
 import tracker from 'mark/api/tracker';
 
 
@@ -25,15 +26,18 @@ tracker.useLegacyTrackerApi = true;
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Route to show TrackedEntitiesTable with data */}
-        <Route path="/" element={<TrackedEntitiesTable orgUnits = {orgUnits} trackedEntityType="MCPQUTHX1Ze"/>} />
-        
-        {/* Route for details page */}
-        <Route path="/instanceDetails/" element={<TrackedEntityDetails />} />
-      </Routes>
-    </Router>
+    <TrackedEntityProvider> {/* Wrap Routes with the context provider */}
+      <Router>
+        <Routes>
+          {/* Route to show TrackedEntitiesTable with data */}
+          <Route path="/" element={<TrackedEntitiesTable orgUnits={orgUnits} trackedEntityType="MCPQUTHX1Ze" />} />
+          
+          {/* Route for details page */}
+          <Route path="/instanceDetails/" element={<TrackedEntityDetails />} />
+          <Route path="/predictionProcessor/" element={<PredictionComponent />} /> {/* Add prediction route */}
+        </Routes>
+      </Router>
+    </TrackedEntityProvider>
   );
 };
 
