@@ -12,37 +12,7 @@ const PredictionComponent = () => {
     // Use trackedEntityData from context
     const jsonData = trackedEntityData;
 
-    // Step 1: Extract data elements
-    const extractDataElements = (data) => {
-      let extractedData = {};
-
-      for (const key in data) {
-        if (data.hasOwnProperty(key)) {
-          const instance = data[key]; // Access the instance by key
-
-          // Access the events if they exist
-          if (instance.events && Array.isArray(instance.events)) {
-            instance.events.forEach(event => {
-              if (event.dataValues && Array.isArray(event.dataValues)) {
-                event.dataValues.forEach(dataValue => {
-                  // Store the value using dataElement as the key
-                  extractedData[dataValue.dataElement] = dataValue.value;
-                });
-              }
-            });
-          }
-        }
-      }
-
-      return extractedData;
-    };
-
-    // Call to extract data elements from jsonData
-    const processedData = extractDataElements(jsonData);
-    console.log('Processed Data Elements for Prediction:', processedData);
-    console.log('Number of elements extracted:', Object.keys(processedData).length);
-
-    // Step 2: Process the data
+    // Step 1: Extract data elements for categorical and numeric columns
     const categoricalColumns = ['EoO16H5lLK5', 'nVaN4Cpoe9Z', 'jNdLczMvDPT', 
       'OZkvrZWZL0u', 'pYsPUUxPn3v', 'LRzaAyb2vGk', 'dtRfCJvzZRF', 'FZMwpP1ncnZ',
       'z2NcMr02XJs', 'Aw9p1CCIkqL', 'P6eKotYRIvT', 'BQ2qwbH5WXi', 'vvlAUOFU1lc',
@@ -60,14 +30,43 @@ const PredictionComponent = () => {
       'Ep0hN5HdQKS', 'DHPzkmTcDUv', 'pD0tc8UxyGg', 'eP1Yyb3h0ST', 'WoPIO7Jd8EL',
       'G0m1TnJ9CaB', 'CF6JasgPZtt', 'k5LrUGjAGD5', 'wD7EhGND4tu', 'EpvHxcDmxyT',
       'axDtvPeYL2Y', 'WTz4HSqoE5E', 'H85OvvFGG6i', 'ywUNEl0vi3Y', 'pg6UUMn87eM',
-      'JCdqUjZZuvx', 'THirpMvAHgw', 'luQQ9zNTgFM', 'RTKE58980U7', 'U4jSUZPF0HH','J5kKvyU8mpY']; // Replace with actual IDs /* ... other categorical columns */];
+      'JCdqUjZZuvx', 'THirpMvAHgw', 'luQQ9zNTgFM', 'RTKE58980U7', 'U4jSUZPF0HH','J5kKvyU8mpY']; // Replace with actual IDs
 
-    const numericColumns = ['DDzcOBJwRnC', 'OjPmMe220KO', 'uIlwmJ26a6N', 'CXUI1Yrr9gd',
-       'XHkluF3EAg0', 'Rj4uJOP4t96', 'E0oIYbS2lcV', 'j9lDBfNNXlz', 'XwVhny4B7EV', 
-       'R0uqGCHWq4M', 'CpNmdkKzz8O', 'HzhDngURGLk', 'dfNv7RZKIml', 'vZMCHh6nEBZ', 
-       'WBsNDNQUgeX', 'Ghsh3wqVTif', 'xcTT5oXggBZ', 'Dq2CKpBrLem'];
+    const numericColumns = ['DDzcOBJwRnC', 'OjPmMe220KO', 'uIlwmJ26a6N', 
+       'CXUI1Yrr9gd', 'XHkluF3EAg0', 'Rj4uJOP4t96', 'E0oIYbS2lcV', 'j9lDBfNNXlz', 
+       'XwVhny4B7EV', 'R0uqGCHWq4M', 'CpNmdkKzz8O', 'HzhDngURGLk', 'dfNv7RZKIml', 
+       'vZMCHh6nEBZ', 'WBsNDNQUgeX', 'Ghsh3wqVTif', 'xcTT5oXggBZ', 'Dq2CKpBrLem'];
 
-    console.log('Total number of feature columns:', categoricalColumns.length + numericColumns.length);
+    const extractDataElements = (data, categoricalColumns, numericColumns) => {
+      let extractedData = {};
+
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          const instance = data[key]; // Access the instance by key
+
+          // Access the events if they exist
+          if (instance.events && Array.isArray(instance.events)) {
+            instance.events.forEach(event => {
+              if (event.dataValues && Array.isArray(event.dataValues)) {
+                event.dataValues.forEach(dataValue => {
+                  // Check if the dataElement is in categorical or numeric columns
+                  if (categoricalColumns.includes(dataValue.dataElement) || numericColumns.includes(dataValue.dataElement)) {
+                    extractedData[dataValue.dataElement] = dataValue.value;
+                  }
+                });
+              }
+            });
+          }
+        }
+      }
+
+      return extractedData;
+    };
+
+    // Call to extract data elements from jsonData
+    const processedData = extractDataElements(jsonData, categoricalColumns, numericColumns);
+    console.log('Processed Data Elements for Prediction:', processedData);
+    console.log('Number of elements extracted:', Object.keys(processedData).length);
 
     // Convert processedData into an array format suitable for label encoding and normalization
     const dataArray = [processedData]; // Wrap processedData in an array for processing
