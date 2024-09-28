@@ -11,47 +11,58 @@ const PredictionComponent = () => {
 
     // Use trackedEntityData from context
     const jsonData = trackedEntityData;
+    console.log('Json Data for Prediction:', jsonData); // Log JSON data being processed
 
     // Step 1: Extract data elements for categorical and numeric columns
-    const categoricalColumns = ['EoO16H5lLK5', 'nVaN4Cpoe9Z', 'jNdLczMvDPT', 
-      'OZkvrZWZL0u', 'pYsPUUxPn3v', 'LRzaAyb2vGk', 'dtRfCJvzZRF', 'FZMwpP1ncnZ',
-      'z2NcMr02XJs', 'Aw9p1CCIkqL', 'P6eKotYRIvT', 'BQ2qwbH5WXi', 'vvlAUOFU1lc',
-      'iUyb0JGgeqn', 'fOnOoUvD03d', 'kvQ0Wz3ZqFr', 'mDmVRrzihu0', 'YSjR80QKKXo',
-      'YwZN88UJ98d', 'zJWyXO06Rhi', 'b801bG8cIxt', 'lpJPqjVUToo', 'YhHeRvXzmXJ',
-      'f0S6DIqAOE5', 'CxdzmL6vtnx', 't6qq4TXSE7n', 'UtGpqsuTmrD', 'cdGuoKHI3fp',
-      'EDFvw8DsJuH', 'hDaev1EuehO', 'Bivxg5n4goz', 'sVFokCQ8LTV', 'EeE2uJluiAY',
-      'F5P1buF4RHP', 'SRT2JzW4OFx', 'QzfjeqlwN2c', 'ig3ZDT8Mgus', 'aOHalAjOIrJ',
-      'P9DY4UW3BTo', 'UGznqHuXC8A', 'omFhxVHAHW8', 'HHf4Vff0Xrx', 'WqWIsCuYw14',
-      'FtWNuQmVu7j', 'pDoTShM62yi', 'XzNqEEXo00j', 'Wbp0DL9fQYj', 'pDR49oOtJrc',
-      'Jl3oWFGGt1U', 'PZvOW11mGOq', 't1wRW4bpRrj', 'e0mTEFrXZDh', 'sQ4Z6lEiiq6',
-      'hZ4HR3lEOWm', 'aNj8BNicATN', 'rHEeM6ha268', 'IGv6SjkM162', 'K1JiyL94mCT',
-      'WLqYnkV6qx1', 'QcjaZKRl9D4', 'x7uZB9y0Qey', 'U0s0Hul9lmX', 'KAykkHp1p2F',
-      'fhEVXFPNNUc', 'WWREUMZUm7z', 'rluc10OPm1I', 'FklL99yLd3h', 'TFS9P7tu6U6',
-      'Ep0hN5HdQKS', 'DHPzkmTcDUv', 'pD0tc8UxyGg', 'eP1Yyb3h0ST', 'WoPIO7Jd8EL',
-      'G0m1TnJ9CaB', 'CF6JasgPZtt', 'k5LrUGjAGD5', 'wD7EhGND4tu', 'EpvHxcDmxyT',
-      'axDtvPeYL2Y', 'WTz4HSqoE5E', 'H85OvvFGG6i', 'ywUNEl0vi3Y', 'pg6UUMn87eM',
-      'JCdqUjZZuvx', 'THirpMvAHgw', 'luQQ9zNTgFM', 'RTKE58980U7', 'U4jSUZPF0HH','J5kKvyU8mpY']; // Replace with actual IDs
+    const categoricalColumns = ['FZMwpP1ncnZ',	'vvlAUOFU1lc',	'WqWIsCuYw14',
+      	'G0m1TnJ9CaB',	'OZkvrZWZL0u',	'zJWyXO06Rhi',	'luQQ9zNTgFM',	'x7uZB9y0Qey',
+        'aNj8BNicATN',	'pYsPUUxPn3v',	'FklL99yLd3h',	'EeE2uJluiAY',	'pg6UUMn87eM',
+        'H85OvvFGG6i',	'b801bG8cIxt',	't6qq4TXSE7n',	'Wbp0DL9fQYj',	'DHPzkmTcDUv',
+        'EoO16H5lLK5',	'YwZN88UJ98d',	'axDtvPeYL2Y',	'hZ4HR3lEOWm',	'UtGpqsuTmrD',
+        'rluc10OPm1I',	'jNdLczMvDPT',	'iUyb0JGgeqn',	'k5LrUGjAGD5',	'EDFvw8DsJuH',
+        'WLqYnkV6qx1',	'P9DY4UW3BTo',	'e0mTEFrXZDh',	'YhHeRvXzmXJ',	'CxdzmL6vtnx',
+        'HHf4Vff0Xrx',	'LRzaAyb2vGk',	'U4jSUZPF0HH',	'f0S6DIqAOE5',	'ywUNEl0vi3Y',
+        'K1JiyL94mCT',	'dtRfCJvzZRF',	'cdGuoKHI3fp',	'U0s0Hul9lmX',	'hDaev1EuehO',
+        'P6eKotYRIvT',	'mDmVRrzihu0',	'UGznqHuXC8A',	'rHEeM6ha268',	'pDR49oOtJrc',	
+        'Jl3oWFGGt1U',	'pDoTShM62yi',	'RTKE58980U7',	'IGv6SjkM162',	'fOnOoUvD03d',	
+        'QzfjeqlwN2c',	'ig3ZDT8Mgus',	'nVaN4Cpoe9Z',	'BQ2qwbH5WXi',	'KAykkHp1p2F',		
+        'QcjaZKRl9D4',	'lpJPqjVUToo',	'Aw9p1CCIkqL',	'pD0tc8UxyGg',	'fhEVXFPNNUc',		
+        'F5P1buF4RHP',	'XzNqEEXo00j',  'Ep0hN5HdQKS',  'omFhxVHAHW8',  'sVFokCQ8LTV',
+]; // Replace with actual IDs
 
-    const numericColumns = ['DDzcOBJwRnC', 'OjPmMe220KO', 'uIlwmJ26a6N', 
-       'CXUI1Yrr9gd', 'XHkluF3EAg0', 'Rj4uJOP4t96', 'E0oIYbS2lcV', 'j9lDBfNNXlz', 
-       'XwVhny4B7EV', 'R0uqGCHWq4M', 'CpNmdkKzz8O', 'HzhDngURGLk', 'dfNv7RZKIml', 
-       'vZMCHh6nEBZ', 'WBsNDNQUgeX', 'Ghsh3wqVTif', 'xcTT5oXggBZ', 'Dq2CKpBrLem'];
+    const numericColumns = [
+    'E0oIYbS2lcV','uIlwmJ26a6N','XHkluF3EAg0',
+    'HzhDngURGLk','vZMCHh6nEBZ','Gy1jHsTp9P6',
+    'Rj4uJOP4t96','DDzcOBJwRnC','Ghsh3wqVTif',
+    'WBsNDNQUgeX','Dq2CKpBrLem','CpNmdkKzz8O',
+    'xcTT5oXggBZ','XwVhny4B7EV','dfNv7RZKIml',
+                          ];
 
     const extractDataElements = (data, categoricalColumns, numericColumns) => {
       let extractedData = {};
-
+    
       for (const key in data) {
         if (data.hasOwnProperty(key)) {
           const instance = data[key]; // Access the instance by key
-
-          // Access the events if they exist
-          if (instance.events && Array.isArray(instance.events)) {
-            instance.events.forEach(event => {
-              if (event.dataValues && Array.isArray(event.dataValues)) {
-                event.dataValues.forEach(dataValue => {
-                  // Check if the dataElement is in categorical or numeric columns
-                  if (categoricalColumns.includes(dataValue.dataElement) || numericColumns.includes(dataValue.dataElement)) {
-                    extractedData[dataValue.dataElement] = dataValue.value;
+    
+          // Access enrollments if they exist
+          if (instance.enrollments && Array.isArray(instance.enrollments)) {
+            instance.enrollments.forEach(enrollment => {
+              // Access events within each enrollment
+              if (enrollment.events && Array.isArray(enrollment.events)) {
+                enrollment.events.forEach(event => {
+                  if (event.dataValues && Array.isArray(event.dataValues)) {
+                    event.dataValues.forEach(dataValue => {
+                      // Check if the dataElement is in categorical or numeric columns
+                      if (categoricalColumns.includes(dataValue.dataElement) || numericColumns.includes(dataValue.dataElement)) {
+                        // Initialize the array if it doesn't exist
+                        if (!extractedData[dataValue.dataElement]) {
+                          extractedData[dataValue.dataElement] = [];
+                        }
+                        // Add the value to the array
+                        extractedData[dataValue.dataElement].push(dataValue.value);
+                      }
+                    });
                   }
                 });
               }
@@ -59,9 +70,10 @@ const PredictionComponent = () => {
           }
         }
       }
-
+      console.log('Extracted Data:', extractedData);
       return extractedData;
     };
+    
 
     // Call to extract data elements from jsonData
     const processedData = extractDataElements(jsonData, categoricalColumns, numericColumns);
@@ -167,6 +179,7 @@ const PredictionComponent = () => {
         {predictions.map((prediction, index) => (
           <tr key={index}>
             <td>This patient has a {prediction[0].toFixed(2)}% chance of developing MDRTB</td>
+            <td>These are features that contributed to his predcition </td>
           </tr>
         ))}
       </tbody>

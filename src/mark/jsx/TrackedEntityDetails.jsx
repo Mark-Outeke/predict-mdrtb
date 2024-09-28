@@ -63,7 +63,7 @@ const TrackedEntityDetails = () => {
   } else {
     return (
       <div className="container mt-4">
-        <h1>Patients Dashboard</h1>
+        <h1>Patient's Dashboard</h1>
         <p>Total Data Elements: {totalDataElements}</p> {/* Display total number of data elements */}
         <button className="btn btn-primary mb-3" onClick={() => navigate('/predictionProcessor/')}>MDRTB Prediction Score</button>
         {details.enrollments && details.enrollments.length > 0 ? (
