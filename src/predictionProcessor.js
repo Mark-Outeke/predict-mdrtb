@@ -11,115 +11,152 @@ const PredictionComponent = () => {
 
     // Use trackedEntityData from context
     const jsonData = trackedEntityData;
-    console.log('Json Data for Prediction:', jsonData); // Log JSON data being processed
 
     // Step 1: Extract data elements for categorical and numeric columns
-    const categoricalColumns = ['FZMwpP1ncnZ',	'vvlAUOFU1lc',	'WqWIsCuYw14',
-      	'G0m1TnJ9CaB',	'OZkvrZWZL0u',	'zJWyXO06Rhi',	'luQQ9zNTgFM',	'x7uZB9y0Qey',
-        'aNj8BNicATN',	'pYsPUUxPn3v',	'FklL99yLd3h',	'EeE2uJluiAY',	'pg6UUMn87eM',
-        'H85OvvFGG6i',	'b801bG8cIxt',	't6qq4TXSE7n',	'Wbp0DL9fQYj',	'DHPzkmTcDUv',
-        'EoO16H5lLK5',	'YwZN88UJ98d',	'axDtvPeYL2Y',	'hZ4HR3lEOWm',	'UtGpqsuTmrD',
-        'rluc10OPm1I',	'jNdLczMvDPT',	'iUyb0JGgeqn',	'k5LrUGjAGD5',	'EDFvw8DsJuH',
-        'WLqYnkV6qx1',	'P9DY4UW3BTo',	'e0mTEFrXZDh',	'YhHeRvXzmXJ',	'CxdzmL6vtnx',
-        'HHf4Vff0Xrx',	'LRzaAyb2vGk',	'U4jSUZPF0HH',	'f0S6DIqAOE5',	'ywUNEl0vi3Y',
-        'K1JiyL94mCT',	'dtRfCJvzZRF',	'cdGuoKHI3fp',	'U0s0Hul9lmX',	'hDaev1EuehO',
-        'P6eKotYRIvT',	'mDmVRrzihu0',	'UGznqHuXC8A',	'rHEeM6ha268',	'pDR49oOtJrc',	
-        'Jl3oWFGGt1U',	'pDoTShM62yi',	'RTKE58980U7',	'IGv6SjkM162',	'fOnOoUvD03d',	
-        'QzfjeqlwN2c',	'ig3ZDT8Mgus',	'nVaN4Cpoe9Z',	'BQ2qwbH5WXi',	'KAykkHp1p2F',		
-        'QcjaZKRl9D4',	'lpJPqjVUToo',	'Aw9p1CCIkqL',	'pD0tc8UxyGg',	'fhEVXFPNNUc',		
-        'F5P1buF4RHP',	'XzNqEEXo00j',  'Ep0hN5HdQKS',  'omFhxVHAHW8',  'sVFokCQ8LTV',
-]; // Replace with actual IDs
+    const categoricalColumns = [
+      'FZMwpP1ncnZ', 'vvlAUOFU1lc', 'WqWIsCuYw14',
+      'G0m1TnJ9CaB', 'OZkvrZWZL0u', 'zJWyXO06Rhi', 'luQQ9zNTgFM', 'x7uZB9y0Qey',
+      'aNj8BNicATN', 'pYsPUUxPn3v', 'FklL99yLd3h', 'EeE2uJluiAY', 'pg6UUMn87eM',
+      'H85OvvFGG6i', 'b801bG8cIxt', 't6qq4TXSE7n', 'Wbp0DL9fQYj', 'DHPzkmTcDUv',
+      'EoO16H5lLK5', 'YwZN88UJ98d', 'axDtvPeYL2Y', 'hZ4HR3lEOWm', 'UtGpqsuTmrD',
+      'rluc10OPm1I', 'jNdLczMvDPT', 'iUyb0JGgeqn', 'k5LrUGjAGD5', 'EDFvw8DsJuH',
+      'WLqYnkV6qx1', 'P9DY4UW3BTo', 'e0mTEFrXZDh', 'YhHeRvXzmXJ', 'CxdzmL6vtnx',
+      'HHf4Vff0Xrx', 'LRzaAyb2vGk', 'U4jSUZPF0HH', 'f0S6DIqAOE5', 'ywUNEl0vi3Y',
+      'K1JiyL94mCT', 'dtRfCJvzZRF', 'cdGuoKHI3fp', 'U0s0Hul9lmX', 'hDaev1EuehO',
+      'P6eKotYRIvT', 'mDmVRrzihu0', 'UGznqHuXC8A', 'rHEeM6ha268', 'pDR49oOtJrc',
+      'Jl3oWFGGt1U', 'pDoTShM62yi', 'RTKE58980U7', 'IGv6SjkM162', 'fOnOoUvD03d',
+      'QzfjeqlwN2c', 'ig3ZDT8Mgus', 'nVaN4Cpoe9Z', 'BQ2qwbH5WXi', 'KAykkHp1p2F',
+      'lpJPqjVUToo', 'Aw9p1CCIkqL', 'pD0tc8UxyGg', 'fhEVXFPNNUc', 'J5kKvyU8mpY',
+      'F5P1buF4RHP', 'XzNqEEXo00j', 'Ep0hN5HdQKS', 'omFhxVHAHW8', 'sVFokCQ8LTV',
+    ]; // Replace with actual IDs
 
     const numericColumns = [
-    'E0oIYbS2lcV','uIlwmJ26a6N','XHkluF3EAg0',
-    'HzhDngURGLk','vZMCHh6nEBZ','Gy1jHsTp9P6',
-    'Rj4uJOP4t96','DDzcOBJwRnC','Ghsh3wqVTif',
-    'WBsNDNQUgeX','Dq2CKpBrLem','CpNmdkKzz8O',
-    'xcTT5oXggBZ','XwVhny4B7EV','dfNv7RZKIml',
-                          ];
+      'E0oIYbS2lcV', 'uIlwmJ26a6N', 'XHkluF3EAg0',
+      'HzhDngURGLk', 'vZMCHh6nEBZ', 'Gy1jHsTp9P6',
+      'Rj4uJOP4t96', 'DDzcOBJwRnC', 'Ghsh3wqVTif',
+      'WBsNDNQUgeX', 'Dq2CKpBrLem', 'CpNmdkKzz8O',
+      'xcTT5oXggBZ', 'XwVhny4B7EV', 'dfNv7RZKIml',
+    ];
 
     const extractDataElements = (data, categoricalColumns, numericColumns) => {
       let extractedData = {};
-    
-      for (const key in data) {
-        if (data.hasOwnProperty(key)) {
-          const instance = data[key]; // Access the instance by key
-    
-          // Access enrollments if they exist
-          if (instance.enrollments && Array.isArray(instance.enrollments)) {
-            instance.enrollments.forEach(enrollment => {
-              // Access events within each enrollment
-              if (enrollment.events && Array.isArray(enrollment.events)) {
-                enrollment.events.forEach(event => {
-                  if (event.dataValues && Array.isArray(event.dataValues)) {
-                    event.dataValues.forEach(dataValue => {
-                      // Check if the dataElement is in categorical or numeric columns
-                      if (categoricalColumns.includes(dataValue.dataElement) || numericColumns.includes(dataValue.dataElement)) {
-                        // Initialize the array if it doesn't exist
-                        if (!extractedData[dataValue.dataElement]) {
-                          extractedData[dataValue.dataElement] = [];
-                        }
-                        // Add the value to the array
-                        extractedData[dataValue.dataElement].push(dataValue.value);
-                      }
-                    });
+
+      // Extracting data from enrollments
+      if (data.enrollments && Array.isArray(data.enrollments)) {
+        data.enrollments.forEach(enrollment => {
+          if (enrollment.events && Array.isArray(enrollment.events)) {
+            enrollment.events.forEach(event => {
+              let eventData = {};
+              if (event.dataValues && Array.isArray(event.dataValues)) {
+                event.dataValues.forEach(dataValue => {
+                  // Check if the dataElement is in specified columns
+                  if (categoricalColumns.includes(dataValue.dataElement) || numericColumns.includes(dataValue.dataElement)) {
+                    // Initialize array for the dataElement if it doesn't exist
+                    if (!eventData[dataValue.dataElement]) {
+                      eventData[dataValue.dataElement] = [];
+                    }
+                    // Push the value to the corresponding array
+                    eventData[dataValue.dataElement].push(dataValue.value);
                   }
                 });
               }
+              extractedData[event.event] = eventData;
             });
           }
-        }
-      }
-      console.log('Extracted Data:', extractedData);
-      return extractedData;
-    };
-    
-
-    // Call to extract data elements from jsonData
-    const processedData = extractDataElements(jsonData, categoricalColumns, numericColumns);
-    console.log('Processed Data Elements for Prediction:', processedData);
-    console.log('Number of elements extracted:', Object.keys(processedData).length);
-
-    // Convert processedData into an array format suitable for label encoding and normalization
-    const dataArray = [processedData]; // Wrap processedData in an array for processing
-
-    // Label encode categorical columns
-    const labelEncode = (data, categoricalColumns) => {
-      const labelEncoders = {};
-
-      categoricalColumns.forEach(col => {
-        labelEncoders[col] = {};
-        let label = 0;
-        data.forEach(row => {
-          const value = row[col];
-          if (!(value in labelEncoders[col])) {
-            labelEncoders[col][value] = label++;
-          }
-          row[col] = labelEncoders[col][value];
         });
+      }
+
+      // Log the extracted data
+      console.log('Extracted Data:', extractedData);
+
+      // Initialize processedData as an array to store events
+      const processedData = [];
+
+      // Iterate over extractedData to combine values for each data element per event
+      Object.entries(extractedData).forEach(([eventName, eventData]) => {
+        // Create an object for each event
+        const eventEntry = {};
+
+        Object.entries(eventData).forEach(([dataElement, values]) => {
+          // Store data elements and their values for the current event
+          eventEntry[dataElement] = values;
+        });
+
+        // Push the current event entry into processedData
+        processedData.push({ event: eventName, data: eventEntry });
       });
 
-      return { data, labelEncoders };
+      console.log('Processed Data per Event:', processedData); // Log the new structured output
+
+      return processedData; // Return the consolidated data
     };
 
-    const { data: labelEncodedData } = labelEncode(dataArray, categoricalColumns);
+    // Extract data elements from jsonData
+    const processedData = extractDataElements(jsonData, categoricalColumns, numericColumns);
+    console.log('Final Processed Data:', processedData);
+
+    if (!Array.isArray(processedData) || processedData.length === 0) {
+      console.error("Invalid processed data structure:", processedData);
+      return; // Early exit if the data is invalid
+    }
+
+    // Convert processedData into an array format suitable for label encoding and normalization
+    const dataArray = processedData;
+
+    const loadLabelEncoders = async () => {
+      const response = await fetch('/label_encoders.json');
+      const labelEncoders = await response.json();
+      return labelEncoders;
+    };
+
+    // Label encode categorical columns
+    const labelEncode = async (data, categoricalColumns) => {
+      const labelEncoders = await loadLabelEncoders();
+
+      categoricalColumns.forEach(col => {
+        if (labelEncoders[col]) { // Only process columns that have encoders
+          data.forEach(row => {
+            const value = row.data[col];
+
+            // If the value exists in the encoder mapping, substitute it
+            if (value in labelEncoders[col]) {
+              row.data[col] = labelEncoders[col][value];
+            } else {
+              row.data[col] = 1; // Handle unknown values
+            }
+          });
+        }
+      });
+      console.log ('Encoded Data:', data);
+      return { data, labelEncoders }; // Data retains the reference to encoder mappings
+    };
+
+    const { data: labelEncodedData } = await labelEncode(dataArray, categoricalColumns);
 
     // Normalize numeric data
     const normalizeData = (data, numericColumns) => {
       const stats = {};
 
+      if (!Array.isArray(data)) {
+        console.error("Expected data to be an array, but got:", data);
+        return { data: [], stats };
+      }
+
       numericColumns.forEach(col => {
-        const values = data.map(row => parseFloat(row[col])).filter(val => !isNaN(val));
-        const mean = values.reduce((a, b) => a + b, 0) / values.length;
-        const std = Math.sqrt(values.map(val => Math.pow(val - mean, 2)).reduce((a, b) => a + b, 0) / values.length);
+        const values = data.map(row => parseFloat(row.data[col]?.[0] || 0)).filter(val => !isNaN(val));
 
-        stats[col] = { mean, std };
+        if (values.length > 0) {
+          const mean = values.reduce((a, b) => a + b, 0) / values.length;
+          const std = Math.sqrt(values.map(val => Math.pow(val - mean, 2)).reduce((a, b) => a + b, 0) / values.length);
 
-        data.forEach(row => {
-          let val = parseFloat(row[col]);
-          val = isNaN(val) ? 0 : (val - mean) / std;
-          row[col] = val;
-        });
+          stats[col] = { mean, std };
+
+          data.forEach(row => {
+            let val = parseFloat(row.data[col]);
+            val = isNaN(val) ? 0 : (val - mean) / std;
+            row.data[col] = val;
+          });
+        }
       });
 
       return { data, stats };
@@ -130,9 +167,9 @@ const PredictionComponent = () => {
     // Handle missing values
     const handleMissingValues = (data) => {
       data.forEach(row => {
-        Object.keys(row).forEach(key => {
-          if (row[key] == null || isNaN(row[key])) {
-            row[key] = 0; // Replace missing or NaN with 0
+        Object.keys(row.data).forEach(key => {
+          if (row.data[key] === undefined || row.data[key] === null) {
+            row.data[key] = 0; // Impute missing values with 0
           }
         });
       });
@@ -142,48 +179,41 @@ const PredictionComponent = () => {
 
     const finalData = handleMissingValues(normalizedData);
 
-    // Prepare input data
-    const featureColumns = [...categoricalColumns, ...numericColumns];
-    const inputData = finalData.map(row => {
-      return featureColumns.map(col => row[col]);
-    });
+    // Load TensorFlow model and make predictions
+    const loadModel = async () => {
+      try {
+        const model = await tf.loadLayersModel('/model.json');
+        return model;
+      } catch (error) {
+        console.error('Error loading the TensorFlow model:', error);
+        return null;
+      }
+    };
 
-    // Step 3: Load the model from a pre-existing model.json file
-    const model = await tf.loadLayersModel('/model.json');
+    const model = await loadModel();
+    if (model) {
+      const inputTensor = tf.tensor(finalData.map(row => Object.values(row.data)));
 
-    // Prepare input tensor
-    const inputDataShape = [inputData.length, featureColumns.length];
-    const inputTensor = tf.tensor2d(inputData, inputDataShape);
-    console.log('Input Tensor Shape:', inputTensor.shape);
-    // Make predictions
-    const predictionsTensor = model.predict(inputTensor);
-    const predictionValues = await predictionsTensor.array();
+      const outputTensor = model.predict(inputTensor);
+      const predictions = outputTensor.arraySync();
 
-    // Set the predictions in the state
-    setPredictions(predictionValues);
-    console.log('Predictions:', predictionValues);
+      setPredictions(predictions);
+    }
   };
 
   useEffect(() => {
-    runPrediction(); // Run prediction when the component mounts
-  }, );
+    runPrediction();
+  });
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Prediction</th>
-        </tr>
-      </thead>
-      <tbody>
+    <div>
+      <h1>Predictions</h1>
+      <ul>
         {predictions.map((prediction, index) => (
-          <tr key={index}>
-            <td>This patient has a {prediction[0].toFixed(2)}% chance of developing MDRTB</td>
-            <td>These are features that contributed to his predcition </td>
-          </tr>
+          <li key={index}>Prediction {index + 1}: {prediction}</li>
         ))}
-      </tbody>
-    </table>
+      </ul>
+    </div>
   );
 };
 
