@@ -116,17 +116,21 @@ const PredictionComponent = () => {
       categoricalColumns.forEach(col => {
         if (labelEncoders[col]) { // Only process columns that have encoders
           data.forEach(row => {
-            const value = row.data[col];
+            const originalValue = row.data[col];
+            console.log(`original value for ${col}:`, originalValue, `Type: ${typeof originalValue}`);
 
             // If the value exists in the encoder mapping, substitute it
-            if (value in labelEncoders[col]) {
-              row.data[col] = labelEncoders[col][value];
+            if (originalValue in labelEncoders[col]) {
+              row.data[col] = labelEncoders[col][originalValue];
+              console.log(`encoded value for ${col}:`, row.data[col], `Type: ${typeof row.data[col]}`);
             } else {
-              row.data[col] = 1; // Handle unknown values
+              row.data[col] = 0; // Handle unknown values
+              console.log(`Unknown Value for ${col}. Set to 0.`);
             }
           });
         }
       });
+      console.log('Encoded Data Before Scaling/Normalization:', JSON.stringify(data, null, 2));
       console.log ('Encoded Data:', data);
       return { data, labelEncoders }; // Data retains the reference to encoder mappings
     };

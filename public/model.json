@@ -155,7 +155,7 @@
             }
           }
         ],
-        "build_input_shape": [1, 84]
+        "build_input_shape": [null, 84]
       }
     },
     "training_config": {

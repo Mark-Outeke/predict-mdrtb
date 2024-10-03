@@ -1,1033 +1,449 @@
 {
-	"FZMwpP1ncnZ": {
-		"classes": [
-			"Known DM (KDM)",
-			"New DM (NDM)",
-			"Normal",
-			"Not Known"
-		],
-		"mapping": {
-			"0": "Known DM (KDM)",
-			"1": "New DM (NDM)",
-			"2": "Normal",
-			"3": "Not Known"
-		}
-	},
-	"vvlAUOFU1lc": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"WqWIsCuYw14": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"G0m1TnJ9CaB": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"OZkvrZWZL0u": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"zJWyXO06Rhi": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"luQQ9zNTgFM": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"x7uZB9y0Qey": {
-		"classes": [
-			"1-10 AFB per HPF(++)",
-			"1-9 AFB per 100HPF (Scanty)",
-			"10-99 AFB per 100 HPF (+)",
-			"> 10 AFB per HPF(+++)",
-			"No AFB (0)",
-			"Not Done",
-			"Others Specify"
-		],
-		"mapping": {
-			"0": "1-10 AFB per HPF(++)",
-			"1": "1-9 AFB per 100HPF (Scanty)",
-			"2": "10-99 AFB per 100 HPF (+)",
-			"3": "> 10 AFB per HPF(+++)",
-			"4": "No AFB (0)",
-			"5": "Not Done",
-			"6": "Others Specify"
-		}
-	},
-	"aNj8BNicATN": {
-		"classes": [
-			"+",
-			"++",
-			"+++",
-			"No Oedema"
-		],
-		"mapping": {
-			"0": "+",
-			"1": "++",
-			"2": "+++",
-			"3": "No Oedema"
-		}
-	},
-	"pYsPUUxPn3v": {
-		"classes": [
-			"ABC+3TC+ATV/r",
-			"ABC+3TC+DTG",
-			"ABC+3TC+EFV",
-			"ABC+3TC+LPV/r",
-			"ABC+3TC+NVP",
-			"ABC+ddl(250)+LPV/r",
-			"ABC+ddl(400)+LPV/r",
-			"ABC+ddl+ATV/r",
-			"ABC+ddl+LPV/r",
-			"ABC+ddl+NVP",
-			"ABC+ddl+SQV/r",
-			"AZT+3TC+ATV/r",
-			"AZT+3TC+DTG",
-			"AZT+3TC+EFV",
-			"AZT+3TC+LPV/r",
-			"AZT+3TC+NVP",
-			"AZT+ABC+LPV/r",
-			"Other",
-			"TDF+3TC+ATV/r",
-			"TDF+3TC+DTG",
-			"TDF+3TC+EFV",
-			"TDF+3TC+LPV/r",
-			"TDF+3TC+NVP",
-			"TDF+FTC+EFV",
-			"TDF+FTC+LPV/r",
-			"TDF+FTC+NVP",
-			"ZDV+ddl(250)+LPV/r",
-			"ZDV+ddl(400)+LPV/r",
-			"ZDV+ddl+LPV/r",
-			"d4T+3TC+EFV",
-			"d4T+3TC+NVP",
-			"nan"
-		],
-		"mapping": {
-			"0": "ABC+3TC+ATV/r",
-			"1": "ABC+3TC+DTG",
-			"2": "ABC+3TC+EFV",
-			"3": "ABC+3TC+LPV/r",
-			"4": "ABC+3TC+NVP",
-			"5": "ABC+ddl(250)+LPV/r",
-			"6": "ABC+ddl(400)+LPV/r",
-			"7": "ABC+ddl+ATV/r",
-			"8": "ABC+ddl+LPV/r",
-			"9": "ABC+ddl+NVP",
-			"10": "ABC+ddl+SQV/r",
-			"11": "AZT+3TC+ATV/r",
-			"12": "AZT+3TC+DTG",
-			"13": "AZT+3TC+EFV",
-			"14": "AZT+3TC+LPV/r",
-			"15": "AZT+3TC+NVP",
-			"16": "AZT+ABC+LPV/r",
-			"17": "Other",
-			"18": "TDF+3TC+ATV/r",
-			"19": "TDF+3TC+DTG",
-			"20": "TDF+3TC+EFV",
-			"21": "TDF+3TC+LPV/r",
-			"22": "TDF+3TC+NVP",
-			"23": "TDF+FTC+EFV",
-			"24": "TDF+FTC+LPV/r",
-			"25": "TDF+FTC+NVP",
-			"26": "ZDV+ddl(250)+LPV/r",
-			"27": "ZDV+ddl(400)+LPV/r",
-			"28": "ZDV+ddl+LPV/r",
-			"29": "d4T+3TC+EFV",
-			"30": "d4T+3TC+NVP",
-			"31": "nan"
-		}
-	},
-	"FklL99yLd3h": {
-		"classes": [
-			"Yes",
-			"nan"
-		],
-		"mapping": {
-			"0": "Yes",
-			"1": "nan"
-		}
-	},
-	"EeE2uJluiAY": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"pg6UUMn87eM": {
-		"classes": [
-			"Already on CPT",
-			"Initiated on CPT",
-			"Not on CPT",
-			"nan"
-		],
-		"mapping": {
-			"0": "Already on CPT",
-			"1": "Initiated on CPT",
-			"2": "Not on CPT",
-			"3": "nan"
-		}
-	},
-	"H85OvvFGG6i": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"b801bG8cIxt": {
-		"classes": [
-			"Already on ART",
-			"Initiated on ART",
-			"nan"
-		],
-		"mapping": {
-			"0": "Already on ART",
-			"1": "Initiated on ART",
-			"2": "nan"
-		}
-	},
-	"t6qq4TXSE7n": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"Wbp0DL9fQYj": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"DHPzkmTcDUv": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"EoO16H5lLK5": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"YwZN88UJ98d": {
-		"classes": [
-			"Nutrition Counselling",
-			"Referral",
-			"Supplementary Foods",
-			"Therapeutic foods",
-			"nan"
-		],
-		"mapping": {
-			"0": "Nutrition Counselling",
-			"1": "Referral",
-			"2": "Supplementary Foods",
-			"3": "Therapeutic foods",
-			"4": "nan"
-		}
-	},
-	"axDtvPeYL2Y": {
-		"classes": [
-			"2RHZE/ 10 RH",
-			"2RHZE/ 4RH",
-			"nan"
-		],
-		"mapping": {
-			"0": "2RHZE/ 10 RH",
-			"1": "2RHZE/ 4RH",
-			"2": "nan"
-		}
-	},
-	"hZ4HR3lEOWm": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"UtGpqsuTmrD": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"rluc10OPm1I": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"jNdLczMvDPT": {
-		"classes": [
-			"Bilateral Consolidation",
-			"Cavities",
-			"Diffuse opacities",
-			"Focal upper lobe opacities",
-			"Miliary pattern",
-			"Nodules",
-			"Normal chest radiograph",
-			"Pleural effusion",
-			"Reticulonodular opacities",
-			"Unilateral Consolidation",
-			"X-ray lesions",
-			"nan",
-			"ntrathoracic lymphadenopathy"
-		],
-		"mapping": {
-			"0": "Bilateral Consolidation",
-			"1": "Cavities",
-			"2": "Diffuse opacities",
-			"3": "Focal upper lobe opacities",
-			"4": "Miliary pattern",
-			"5": "Nodules",
-			"6": "Normal chest radiograph",
-			"7": "Pleural effusion",
-			"8": "Reticulonodular opacities",
-			"9": "Unilateral Consolidation",
-			"10": "X-ray lesions",
-			"11": "nan",
-			"12": "ntrathoracic lymphadenopathy"
-		}
-	},
-	"iUyb0JGgeqn": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"k5LrUGjAGD5": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"EDFvw8DsJuH": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"WLqYnkV6qx1": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"P9DY4UW3BTo": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"e0mTEFrXZDh": {
-		"classes": [
-			"Invalid / Indeterminate",
-			"Negative",
-			"Positive"
-		],
-		"mapping": {
-			"0": "Invalid / Indeterminate",
-			"1": "Negative",
-			"2": "Positive"
-		}
-	},
-	"YhHeRvXzmXJ": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"CxdzmL6vtnx": {
-		"classes": [
-			"No",
-			"Yes"
-		],
-		"mapping": {
-			"0": "No",
-			"1": "Yes"
-		}
-	},
-	"HHf4Vff0Xrx": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"LRzaAyb2vGk": {
-		"classes": [
-			"Abnormal",
-			"Normal"
-		],
-		"mapping": {
-			"0": "Abnormal",
-			"1": "Normal"
-		}
-	},
-	"U4jSUZPF0HH": {
-		"classes": [
-			"1-2 Weeks",
-			"3-4 Weeks",
-			"5-6 Weeks",
-			"7-8 Weeks",
-			"Month 3",
-			"Month 4",
-			"Month 5",
-			"Month 6",
-			"Month 7"
-		],
-		"mapping": {
-			"0": "1-2 Weeks",
-			"1": "3-4 Weeks",
-			"2": "5-6 Weeks",
-			"3": "7-8 Weeks",
-			"4": "Month 3",
-			"5": "Month 4",
-			"6": "Month 5",
-			"7": "Month 6",
-			"8": "Month 7"
-		}
-	},
-	"f0S6DIqAOE5": {
-		"classes": [
-			"No"
-		],
-		"mapping": {
-			"0": "No"
-		}
-	},
-	"ywUNEl0vi3Y": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"K1JiyL94mCT": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"dtRfCJvzZRF": {
-		"classes": [
-			"Known Positive",
-			"Negative",
-			"Newly tested Positive",
-			"Unknown"
-		],
-		"mapping": {
-			"0": "Known Positive",
-			"1": "Negative",
-			"2": "Newly tested Positive",
-			"3": "Unknown"
-		}
-	},
-	"cdGuoKHI3fp": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"U0s0Hul9lmX": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"P6eKotYRIvT": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"mDmVRrzihu0": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"UGznqHuXC8A": {
-		"classes": [
-			"Non Severe",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Non Severe",
-			"1": "Severe"
-		}
-	},
-	"rHEeM6ha268": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"pDR49oOtJrc": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"hDaev1EuehO": {
-		"classes": [
-			"New",
-			"Relapse",
-			"Treatment after Lost to Follow up",
-			"Treatment after failure",
-			"Treatment history Unknown"
-		],
-		"mapping": {
-			"0": "New",
-			"1": "Relapse",
-			"2": "Treatment after Lost to Follow up",
-			"3": "Treatment after failure",
-			"4": "Treatment history Unknown"
-		}
-	},
-	"Jl3oWFGGt1U": {
-		"classes": [
-			"Moderate Acute Malnutrition",
-			"Obese",
-			"Overweight",
-			"Severe Acute Malnutrition",
-			"nan"
-		],
-		"mapping": {
-			"0": "Moderate Acute Malnutrition",
-			"1": "Obese",
-			"2": "Overweight",
-			"3": "Severe Acute Malnutrition",
-			"4": "nan"
-		}
-	},
-	"pDoTShM62yi": {
-		"classes": [
-			"Digital Community DOT",
-			"Non-Digital Community DOT"
-		],
-		"mapping": {
-			"0": "Digital Community DOT",
-			"1": "Non-Digital Community DOT"
-		}
-	},
-	"RTKE58980U7": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"IGv6SjkM162": {
-		"classes": [
-			"Abdomen",
-			"Abdominal",
-			"Bones",
-			"Hip Bone",
-			"Laryngitis",
-			"Lungs",
-			"Lymph Node",
-			"P effusion",
-			"Pericarditis",
-			"Pleural",
-			"nan",
-			"spine"
-		],
-		"mapping": {
-			"0": "Abdomen",
-			"1": "Abdominal",
-			"2": "Bones",
-			"3": "Hip Bone",
-			"4": "Laryngitis",
-			"5": "Lungs",
-			"6": "Lymph Node",
-			"7": "P effusion",
-			"8": "Pericarditis",
-			"9": "Pleural",
-			"10": "nan",
-			"11": "spine"
-		}
-	},
-	"fOnOoUvD03d": {
-		"classes": [
-			"No",
-			"Yes"
-		],
-		"mapping": {
-			"0": "No",
-			"1": "Yes"
-		}
-	},
-	"Ep0hN5HdQKS": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"QzfjeqlwN2c": {
-		"classes": [
-			"Yes",
-			"nan"
-		],
-		"mapping": {
-			"0": "Yes",
-			"1": "nan"
-		}
-	},
-	"ig3ZDT8Mgus": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"nVaN4Cpoe9Z": {
-		"classes": [
-			"Known DM (KDM)",
-			"New DM (NDM)",
-			"nan"
-		],
-		"mapping": {
-			"0": "Known DM (KDM)",
-			"1": "New DM (NDM)",
-			"2": "nan"
-		}
-	},
-	"BQ2qwbH5WXi": {
-		"classes": [
-			"True",
-			"nan"
-		],
-		"mapping": {
-			"0": "True",
-			"1": "nan"
-		}
-	},
-	"KAykkHp1p2F": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"omFhxVHAHW8": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"lpJPqjVUToo": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"Aw9p1CCIkqL": {
-		"classes": [
-			"Extra pulmonary (EP) TB",
-			"Pulmonary Clinically Diagnosed (P-CD) TB",
-			"Pulmonary bacteriologically confirmed (P-BC)TB"
-		],
-		"mapping": {
-			"0": "Extra pulmonary (EP) TB",
-			"1": "Pulmonary Clinically Diagnosed (P-CD) TB",
-			"2": "Pulmonary bacteriologically confirmed (P-BC)TB"
-		}
-	},
-	"pD0tc8UxyGg": {
-		"classes": [
-			"MTB detected, rifampicin resistance not detected"
-		],
-		"mapping": {
-			"0": "MTB detected, rifampicin resistance not detected"
-		}
-	},
-	"fhEVXFPNNUc": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"sVFokCQ8LTV": {
-		"classes": [
-			"IMF"
-		],
-		"mapping": {
-			"0": "IMF"
-		}
-	},
-	"F5P1buF4RHP": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-	},
-	"XzNqEEXo00j": {
-		"classes": [
-			"Life threatening",
-			"Mild",
-			"Moderate",
-			"No side effects",
-			"Severe"
-		],
-		"mapping": {
-			"0": "Life threatening",
-			"1": "Mild",
-			"2": "Moderate",
-			"3": "No side effects",
-			"4": "Severe"
-		}
-		
-	},
-	"J5kKvyU8mpY": {
-		"classes": [
-			"No",
-			"Yes"
-		],
-		"mapping": {
-			"0": "No",
-			"1": "Yes"
-		}
-	}
+  "FZMwpP1ncnZ": {
+    "Known DM (KDM)": 0,
+    "New DM (NDM)": 1,
+    "Normal": 2,
+    "Not Known": 3
+  },
+  "vvlAUOFU1lc": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "WqWIsCuYw14": {
+    "True": 0,
+    "nan": 1
+  },
+  "G0m1TnJ9CaB": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "OZkvrZWZL0u": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "zJWyXO06Rhi": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "luQQ9zNTgFM": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "x7uZB9y0Qey": {
+    "1-10 AFB per HPF(++)": 0,
+    "1-9 AFB per 100HPF (Scanty)": 1,
+    "10-99 AFB per 100 HPF (+)": 2,
+    "> 10 AFB per HPF(+++)": 3,
+    "No AFB (0)": 4,
+    "Not Done": 5,
+    "Others Specify": 6
+  },
+  "aNj8BNicATN": {
+    "+": 0,
+    "++": 1,
+    "+++": 2,
+    "No Oedema": 3
+  },
+  "pYsPUUxPn3v": {
+    "ABC+3TC+ATV/r": 0,
+    "ABC+3TC+DTG": 1,
+    "ABC+3TC+EFV": 2,
+    "ABC+3TC+LPV/r": 3,
+    "ABC+3TC+NVP": 4,
+    "ABC+ddl(250)+LPV/r": 5,
+    "ABC+ddl(400)+LPV/r": 6,
+    "ABC+ddl+ATV/r": 7,
+    "ABC+ddl+LPV/r": 8,
+    "ABC+ddl+NVP": 9,
+    "ABC+ddl+SQV/r": 10,
+    "AZT+3TC+ATV/r": 11,
+    "AZT+3TC+DTG": 12,
+    "AZT+3TC+EFV": 13,
+    "AZT+3TC+LPV/r": 14,
+    "AZT+3TC+NVP": 15,
+    "AZT+ABC+LPV/r": 16,
+    "Other": 17,
+    "TDF+3TC+ATV/r": 18,
+    "TDF+3TC+DTG": 19,
+    "TDF+3TC+EFV": 20,
+    "TDF+3TC+LPV/r": 21,
+    "TDF+3TC+NVP": 22,
+    "TDF+FTC+EFV": 23,
+    "TDF+FTC+LPV/r": 24,
+    "TDF+FTC+NVP": 25,
+    "ZDV+ddl(250)+LPV/r": 26,
+    "ZDV+ddl(400)+LPV/r": 27,
+    "ZDV+ddl+LPV/r": 28,
+    "d4T+3TC+EFV": 29,
+    "d4T+3TC+NVP": 30,
+    "nan": 31
+  },
+  "FklL99yLd3h": {
+    "Yes": 0,
+    "nan": 1
+  },
+  "EeE2uJluiAY": {
+    "True": 0,
+    "nan": 1
+  },
+  "pg6UUMn87eM": {
+    "Already on CPT": 0,
+    "Initiated on CPT": 1,
+    "Not on CPT": 2,
+    "nan": 3
+  },
+  "H85OvvFGG6i": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "b801bG8cIxt": {
+    "Already on ART": 0,
+    "Initiated on ART": 1,
+    "nan": 2
+  },
+  "t6qq4TXSE7n": {
+    "True": 0,
+    "nan": 1
+  },
+  "Wbp0DL9fQYj": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "DHPzkmTcDUv": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "EoO16H5lLK5": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "YwZN88UJ98d": {
+    "Nutrition Counselling": 0,
+    "Referral": 1,
+    "Supplementary Foods": 2,
+    "Therapeutic foods": 3,
+    "nan": 4
+  },
+  "axDtvPeYL2Y": {
+    "2RHZE/ 10 RH": 0,
+    "2RHZE/ 4RH": 1,
+    "nan": 2
+  },
+  "hZ4HR3lEOWm": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "UtGpqsuTmrD": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "rluc10OPm1I": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "jNdLczMvDPT": {
+    "Bilateral Consolidation": 0,
+    "Cavities": 1,
+    "Diffuse opacities": 2,
+    "Focal upper lobe opacities": 3,
+    "Miliary pattern": 4,
+    "Nodules": 5,
+    "Normal chest radiograph": 6,
+    "Pleural effusion": 7,
+    "Reticulonodular opacities": 8,
+    "Unilateral Consolidation": 9,
+    "X-ray lesions": 10,
+    "nan": 11,
+    "ntrathoracic lymphadenopathy": 12
+  },
+  "iUyb0JGgeqn": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "k5LrUGjAGD5": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "EDFvw8DsJuH": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "WLqYnkV6qx1": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "P9DY4UW3BTo": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "e0mTEFrXZDh": {
+    "Invalid / Indeterminate": 0,
+    "Negative": 1,
+    "Positive": 2
+  },
+  "YhHeRvXzmXJ": {
+    "True": 0,
+    "nan": 1
+  },
+  "CxdzmL6vtnx": {
+    "No": 0,
+    "Yes": 1
+  },
+  "HHf4Vff0Xrx": {
+    "True": 0,
+    "nan": 1
+  },
+  "LRzaAyb2vGk": {
+    "Abnormal": 0,
+    "Normal": 1
+  },
+  "U4jSUZPF0HH": {
+    "1-2 Weeks": 0,
+    "3-4 Weeks": 1,
+    "5-6 Weeks": 2,
+    "7-8 Weeks": 3,
+    "Month 3": 4,
+    "Month 4": 5,
+    "Month 5": 6,
+    "Month 6": 7,
+    "Month 7": 8
+  },
+  "f0S6DIqAOE5": {
+    "No": 0
+  },
+  "ywUNEl0vi3Y": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "K1JiyL94mCT": {
+    "True": 0,
+    "nan": 1
+  },
+  "dtRfCJvzZRF": {
+    "Known Positive": 0,
+    "Negative": 1,
+    "Newly tested Positive": 2,
+    "Unknown": 3
+  },
+  "cdGuoKHI3fp": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "U0s0Hul9lmX": {
+    "True": 0,
+    "nan": 1
+  },
+  "P6eKotYRIvT": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "mDmVRrzihu0": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "UGznqHuXC8A": {
+    "Non Severe": 0,
+    "Severe": 1
+  },
+  "rHEeM6ha268": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "pDR49oOtJrc": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "hDaev1EuehO": {
+    "New": 0,
+    "Relapse": 1,
+    "Treatment after Lost to Follow up": 2,
+    "Treatment after failure": 3,
+    "Treatment history Unknown": 4
+  },
+  "Jl3oWFGGt1U": {
+    "Moderate Acute Malnutrition": 0,
+    "Obese": 1,
+    "Overweight": 2,
+    "Severe Acute Malnutrition": 3,
+    "nan": 4
+  },
+  "pDoTShM62yi": {
+    "Digital Community DOT": 0,
+    "Non-Digital Community DOT": 1
+  },
+  "RTKE58980U7": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "IGv6SjkM162": {
+    "Abdomen": 0,
+    "Abdominal": 1,
+    "Bones": 2,
+    "Hip Bone": 3,
+    "Laryngitis": 4,
+    "Lungs": 5,
+    "Lymph Node": 6,
+    "P effusion": 7,
+    "Pericarditis": 8,
+    "Pleural": 9,
+    "nan": 10,
+    "spine": 11
+  },
+  "fOnOoUvD03d": {
+    "No": 0,
+    "Yes": 1
+  },
+  "Ep0hN5HdQKS": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "QzfjeqlwN2c": {
+    "Yes": 0,
+    "nan": 1
+  },
+  "ig3ZDT8Mgus": {
+    "True": 0,
+    "nan": 1
+  },
+  "nVaN4Cpoe9Z": {
+    "Known DM (KDM)": 0,
+    "New DM (NDM)": 1,
+    "nan": 2
+  },
+  "BQ2qwbH5WXi": {
+    "True": 0,
+    "nan": 1
+  },
+  "KAykkHp1p2F": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "omFhxVHAHW8": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "lpJPqjVUToo": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "Aw9p1CCIkqL": {
+    "Extra pulmonary (EP) TB": 0,
+    "Pulmonary Clinically Diagnosed (P-CD) TB": 1,
+    "Pulmonary bacteriologically confirmed (P-BC)TB": 2
+  },
+  "pD0tc8UxyGg": {
+    "MTB detected, rifampicin resistance not detected": 0
+  },
+  "fhEVXFPNNUc": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "sVFokCQ8LTV": {
+    "IMF": 0
+  },
+  "F5P1buF4RHP": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "XzNqEEXo00j": {
+    "Life threatening": 0,
+    "Mild": 1,
+    "Moderate": 2,
+    "No side effects": 3,
+    "Severe": 4
+  },
+  "J5kKvyU8mpY": {
+    "No": 0,
+    "Yes": 1
+  }
 }
