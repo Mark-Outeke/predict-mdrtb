@@ -20,7 +20,7 @@
           {
             "class_name": "InputLayer",
             "config": {
-              "batch_shape": [null, 84],
+              "batch_shape": [null, 82],
               "dtype": "float32",
               "sparse": false,
               "name": "input_layer"
@@ -155,7 +155,7 @@
             }
           }
         ],
-        "build_input_shape": [null, 84]
+        "build_input_shape": [null, 82]
       }
     },
     "training_config": {
@@ -203,7 +203,7 @@
       "weights": [
         {
           "name": "sequential/dense/kernel",
-          "shape": [84, 128],
+          "shape": [82, 128],
           "dtype": "float32"
         },
         { "name": "sequential/dense/bias", "shape": [128], "dtype": "float32" },

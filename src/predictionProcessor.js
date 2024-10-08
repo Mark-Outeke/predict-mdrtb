@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import { useTrackedEntity } from 'TrackedEntityContext'; // Import your existing context
+import {LimeTabularExplainer} from 'lime-js';
 
 const PredictionComponent = () => {
   const { trackedEntityData } = useTrackedEntity(); // Get tracked entity data from context
   const [predictions, setPredictions] = useState([]);
+  const [featureContributions, setFeatureContributions] = useState([]);
 
   const runPrediction = async () => {
     if (!trackedEntityData) return; // Ensure there's data before processing
@@ -26,7 +28,7 @@ const PredictionComponent = () => {
       'P6eKotYRIvT', 'mDmVRrzihu0', 'UGznqHuXC8A', 'rHEeM6ha268', 'pDR49oOtJrc',
       'Jl3oWFGGt1U', 'pDoTShM62yi', 'RTKE58980U7', 'IGv6SjkM162', 'fOnOoUvD03d',
       'QzfjeqlwN2c', 'ig3ZDT8Mgus', 'nVaN4Cpoe9Z', 'BQ2qwbH5WXi', 'KAykkHp1p2F',
-      'lpJPqjVUToo', 'Aw9p1CCIkqL', 'pD0tc8UxyGg', 'fhEVXFPNNUc', 'J5kKvyU8mpY',
+      'lpJPqjVUToo', 'Aw9p1CCIkqL', 'pD0tc8UxyGg', 'fhEVXFPNNUc',
       'F5P1buF4RHP', 'XzNqEEXo00j', 'Ep0hN5HdQKS', 'omFhxVHAHW8', 'sVFokCQ8LTV',
     ]; // Replace with actual IDs
 
@@ -117,21 +119,21 @@ const PredictionComponent = () => {
         if (labelEncoders[col]) { // Only process columns that have encoders
           data.forEach(row => {
             const originalValue = row.data[col];
-            console.log(`original value for ${col}:`, originalValue, `Type: ${typeof originalValue}`);
+            //console.log(`original value for ${col}:`, originalValue, `Type: ${typeof originalValue}`);
 
             // If the value exists in the encoder mapping, substitute it
             if (originalValue in labelEncoders[col]) {
               row.data[col] = labelEncoders[col][originalValue];
-              console.log(`encoded value for ${col}:`, row.data[col], `Type: ${typeof row.data[col]}`);
+              //console.log(`encoded value for ${col}:`, row.data[col], `Type: ${typeof row.data[col]}`);
             } else {
               row.data[col] = 0; // Handle unknown values
-              console.log(`Unknown Value for ${col}. Set to 0.`);
+              //console.log(`Unknown Value for ${col}. Set to 0.`);
             }
           });
         }
       });
-      console.log('Encoded Data Before Scaling/Normalization:', JSON.stringify(data, null, 2));
-      console.log ('Encoded Data:', data);
+      //console.log('Encoded Data Before Scaling/Normalization:', JSON.stringify(data, null, 2));
+      //console.log ('Encoded Data:', data);
       return { data, labelEncoders }; // Data retains the reference to encoder mappings
     };
 
@@ -187,6 +189,7 @@ const PredictionComponent = () => {
     const loadModel = async () => {
       try {
         const model = await tf.loadLayersModel('/model.json');
+        
         return model;
       } catch (error) {
         console.error('Error loading the TensorFlow model:', error);
@@ -196,13 +199,37 @@ const PredictionComponent = () => {
 
     const model = await loadModel();
     if (model) {
-      const inputTensor = tf.tensor(finalData.map(row => Object.values(row.data)));
-
+      console.log('Running Prediction...');
+      const inputTensor = tf.tensor(finalData.map(row => Object.values(row.data).map(value => value)));
+      console.log('input tensor shape:', inputTensor.shape);
+      inputTensor.print();
       const outputTensor = model.predict(inputTensor);
       const predictions = outputTensor.arraySync();
 
       setPredictions(predictions);
+
+      const contributions = await explainPredictions(finalData, model);
+      setFeatureContributions(contributions);
     }
+  };
+   // Function to explain predictions using LIME
+   const explainPredictions = async (data, model) => {
+    const explainer = new LimeTabularExplainer(data[0].data, { // Pass the first row as a reference
+      mode: 'classification', // Use 'regression' if your model is a regression model
+      feature_names: Object.keys(data[0].data), // Use feature names from data
+      class_names: ['Class 1', 'Class 2'], // Update with your actual class names
+      discretize_continuous: true, // Set this as per your data
+    });
+
+    const explanations = [];
+    
+    // Loop through predictions for explaining individual predictions
+    for (let i = 0; i < predictions.length; i++) {
+      const explainerInstance = await explainer.explainInstance(data[i].data, model.predict.bind(model), 10);
+      explanations.push(explainerInstance.as_html()); // Store explanation as HTML
+    }
+    
+    return explanations; // return the array of explanations
   };
 
   useEffect(() => {
@@ -217,6 +244,13 @@ const PredictionComponent = () => {
           <li key={index}>Prediction {index + 1}: {prediction}</li>
         ))}
       </ul>
+      {/* Render Feature Contributions */}
+      <h2>Feature Contributions</h2>
+      <div>
+        {featureContributions.map((contribution, index) => (
+          <div key={index} dangerouslySetInnerHTML={{ __html: contribution }} /> // Render HTML safely
+        ))}
+      </div>
     </div>
   );
 };
