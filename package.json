@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
+    "cors": "^2.8.5",
     "danfojs": "^1.1.2",
     "express": "^4.21.0",
     "lime-js": "^3.0.1",
@@ -43,5 +44,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/lime-js": "^0.0.33"
   }
 }

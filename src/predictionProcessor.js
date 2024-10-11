@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import { useTrackedEntity } from 'TrackedEntityContext'; // Import your existing context
-import {LimeTabularExplainer} from 'lime-js';
+//import LimeTabularExplainer from 'lime-js';
 
 const PredictionComponent = () => {
   const { trackedEntityData } = useTrackedEntity(); // Get tracked entity data from context
@@ -183,35 +183,68 @@ const PredictionComponent = () => {
       return data;
     };
 
-    const finalData = handleMissingValues(normalizedData);
-
-    // Load TensorFlow model and make predictions
-    const loadModel = async () => {
-      try {
-        const model = await tf.loadLayersModel('/model.json');
+  
+      
+      const finalData = handleMissingValues(normalizedData);
+    
+      const extractTensorInputs = (finalData) => {
+        // This function will now return only the first row
+        return finalData.map(row=> Object.values(row.data));
         
-        return model;
-      } catch (error) {
-        console.error('Error loading the TensorFlow model:', error);
-        return null;
+      };
+    
+      // Assuming finalData is available and processed
+      const tensorInputs = extractTensorInputs(finalData);
+      console.log('tensorInputs:', tensorInputs);
+      
+      
+      const loadModel = async () => {
+        try {
+          const model = await tf.loadLayersModel('/model.json', {weights: 'weights.json'});
+          return model;
+        } catch (error) {
+          console.error('Error loading the TensorFlow model:', error);
+          return null;
+        }
+      };
+      // Load TensorFlow model
+      const model = await loadModel();
+      if (model) {
+          console.log('Running Predictions...');
+    
+        // Loop through each tensor input and make predictions
+          const predictions = [];
+          const contributions = []; // Store contributions for each prediction
+    
+          for (let i = 0; i < tensorInputs.length; i++) {
+            const inputTensor = tensorInputs[i]; // Create a tensor for the current row
+          
+        
+            
+            const reshapedInput = tf.tensor(inputTensor).reshape([1, 1, 82]);
+            console.log('length',reshapedInput.size); // Should be 82
+            console.log('reshaped',reshapedInput.shape); // Should be [1, 1, 82]
+            
+            
+        
+            const outputTensor = model.predict(reshapedInput);
+              // Get the prediction for the current row
+            predictions.push(outputTensor.arraySync());
+
+            
+        
+              // Explain predictions for the current row
+          //const explanation = await explainPredictions([finalData[i]], model);
+          //contributions.push(explanation);
+      }
+    
+      setPredictions(predictions);
+      setFeatureContributions(contributions);
+
+      return;
       }
     };
-
-    const model = await loadModel();
-    if (model) {
-      console.log('Running Prediction...');
-      const inputTensor = tf.tensor(finalData.map(row => Object.values(row.data).map(value => value)));
-      console.log('input tensor shape:', inputTensor.shape);
-      inputTensor.print();
-      const outputTensor = model.predict(inputTensor);
-      const predictions = outputTensor.arraySync();
-
-      setPredictions(predictions);
-
-      const contributions = await explainPredictions(finalData, model);
-      setFeatureContributions(contributions);
-    }
-  };
+    /*
    // Function to explain predictions using LIME
    const explainPredictions = async (data, model) => {
     const explainer = new LimeTabularExplainer(data[0].data, { // Pass the first row as a reference
@@ -230,11 +263,11 @@ const PredictionComponent = () => {
     }
     
     return explanations; // return the array of explanations
-  };
+  };*/
 
-  useEffect(() => {
-    runPrediction();
-  });
+useEffect(() => {
+  runPrediction();
+},);
 
   return (
     <div>
