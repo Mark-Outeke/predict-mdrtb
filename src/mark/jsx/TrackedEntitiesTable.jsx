@@ -189,7 +189,8 @@ const TrackedEntitiesTable = (props) => {
   // Handle row click to navigate to InstanceDetails
   const handleRowClick = (row) => {
     console.log(trackedEntities[row.index]);
-
+    //const selectedInstance = trackedEntities[row.index];
+    //props.onEntitySelect(selectedInstance); // Pass the selected entity to the parent
     navigate('/instanceDetails', {
       state: {
         trackedEntity: trackedEntities[row.index]

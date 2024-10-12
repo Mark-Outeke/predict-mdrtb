@@ -5,9 +5,15 @@ const TrackedEntityContext = createContext();
 export const TrackedEntityProvider = ({ children }) => {
   const [trackedEntityData, setTrackedEntityData] = useState(null);
   const [predictionResult, setPredictionResult] = useState(null); // New state for prediction
-
+  
+  const updateTrackedEntity = (newData) => {
+    setTrackedEntityData((prevData) => ({ ...prevData, ...newData }));
+    if (newData.predictions) {
+      setPredictionResult(newData.predictions);
+    }
+  };
   return (
-    <TrackedEntityContext.Provider value={{ trackedEntityData, setTrackedEntityData, predictionResult, setPredictionResult }}>
+    <TrackedEntityContext.Provider value={{ trackedEntityData, setTrackedEntityData, predictionResult, setPredictionResult, updateTrackedEntity }}>
       {children}
     </TrackedEntityContext.Provider>
   );

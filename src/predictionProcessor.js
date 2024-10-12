@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import { useTrackedEntity } from 'TrackedEntityContext'; // Import your existing context
+// eslint-disable-next-line
 //import LimeTabularExplainer from 'lime-js';
 
 const PredictionComponent = () => {
-  const { trackedEntityData } = useTrackedEntity(); // Get tracked entity data from context
+  const { trackedEntityData, updateTrackedEntity } = useTrackedEntity(); // Get tracked entity data from context
   const [predictions, setPredictions] = useState([]);
   const [featureContributions, setFeatureContributions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Track if predictions are running
+
 
   const runPrediction = async () => {
     if (!trackedEntityData) return; // Ensure there's data before processing
@@ -229,6 +232,7 @@ const PredictionComponent = () => {
         
             const outputTensor = model.predict(reshapedInput);
               // Get the prediction for the current row
+              
             predictions.push(outputTensor.arraySync());
 
             
@@ -241,11 +245,14 @@ const PredictionComponent = () => {
       setPredictions(predictions);
       setFeatureContributions(contributions);
 
+      updateTrackedEntity({predictions});
+      setIsLoading(false); // Mark predictions as complete
+
       return;
       }
     };
-    /*
-   // Function to explain predictions using LIME
+    
+   /* Function to explain predictions using LIME
    const explainPredictions = async (data, model) => {
     const explainer = new LimeTabularExplainer(data[0].data, { // Pass the first row as a reference
       mode: 'classification', // Use 'regression' if your model is a regression model
@@ -272,18 +279,41 @@ useEffect(() => {
   return (
     <div>
       <h1>Predictions</h1>
-      <ul>
-        {predictions.map((prediction, index) => (
-          <li key={index}>Prediction {index + 1}: {prediction}</li>
-        ))}
-      </ul>
-      {/* Render Feature Contributions */}
-      <h2>Feature Contributions</h2>
-      <div>
-        {featureContributions.map((contribution, index) => (
-          <div key={index} dangerouslySetInnerHTML={{ __html: contribution }} /> // Render HTML safely
-        ))}
-      </div>
+      {isLoading ? (
+        <p>Loading predictions...</p>
+      ) : (
+        <>
+          <ul>
+            {predictions.map((prediction, index) => (
+              <li key={index}>
+                Prediction {index + 1}: {JSON.stringify(prediction)}
+              </li>
+            ))}
+          </ul>
+          <h2>Feature Contributions</h2>
+          {featureContributions.map((contribution, index) => (
+            <div key={index}>
+              <h3>Prediction {index + 1}</h3>
+              <table border="1" cellPadding="5">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>Contribution</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contribution.map((value, idx) => (
+                    <tr key={idx}>
+                      <td>Feature {idx + 1}</td>
+                      <td>{value.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 };
