@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import { useTrackedEntity } from 'TrackedEntityContext'; // Import your existing context
 // eslint-disable-next-line
@@ -9,10 +9,10 @@ const PredictionComponent = () => {
   const [predictions, setPredictions] = useState([]);
   const [featureContributions, setFeatureContributions] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Track if predictions are running
+  const [hasRunPredictions, setHasRunPredictions] = useState(false); // Track if predictions have been made
 
-
-  const runPrediction = async () => {
-    if (!trackedEntityData) return; // Ensure there's data before processing
+  const runPrediction = useCallback(async () => {
+    if (!trackedEntityData || hasRunPredictions) return; // Ensure there's data before processing
 
     // Use trackedEntityData from context
     const jsonData = trackedEntityData;
@@ -247,34 +247,17 @@ const PredictionComponent = () => {
 
       updateTrackedEntity({predictions});
       setIsLoading(false); // Mark predictions as complete
-
-      return;
-      }
-    };
-    
-   /* Function to explain predictions using LIME
-   const explainPredictions = async (data, model) => {
-    const explainer = new LimeTabularExplainer(data[0].data, { // Pass the first row as a reference
-      mode: 'classification', // Use 'regression' if your model is a regression model
-      feature_names: Object.keys(data[0].data), // Use feature names from data
-      class_names: ['Class 1', 'Class 2'], // Update with your actual class names
-      discretize_continuous: true, // Set this as per your data
-    });
-
-    const explanations = [];
-    
-    // Loop through predictions for explaining individual predictions
-    for (let i = 0; i < predictions.length; i++) {
-      const explainerInstance = await explainer.explainInstance(data[i].data, model.predict.bind(model), 10);
-      explanations.push(explainerInstance.as_html()); // Store explanation as HTML
-    }
-    
-    return explanations; // return the array of explanations
-  };*/
+      setHasRunPredictions(true)
+      return;}
+      
+    }, [trackedEntityData,hasRunPredictions, updateTrackedEntity]);
+   
 
 useEffect(() => {
-  runPrediction();
-},);
+  if (trackedEntityData && !hasRunPredictions ) {
+     runPrediction();
+  }
+},[trackedEntityData, hasRunPredictions, runPrediction]);
 
   return (
     <div>

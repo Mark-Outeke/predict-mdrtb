@@ -1,0 +1,48 @@
+.header {
+    background-color:rgb(44, 102, 147); /* Header background color */
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: right;
+    width: 100%;
+  }
+  
+  .header-content h1 {
+    margin: 0;
+  }
+  
+  .header-content nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+  
+  .header-content nav ul li {
+    margin: 0 10px;
+  }
+  
+  .header-content nav ul li a {
+    color: white;
+    text-decoration: none;
+  }
+  .logo-container {
+    display: flex;
+    align-items: center; /* Ensure both the logo and text are centered */
+    margin-right: 10px /* Space between logo and title */
+  }
+  
+  .logo {
+    height: 40px; /* Adjust the height as needed */
+    margin-right: 10px;
+  }
+  .header-title {
+    font-size: 1.5rem; /* Adjust text size */
+    margin: 0;
+  }

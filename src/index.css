@@ -10,6 +10,7 @@ html
 
 
 body {
+  height: 100%;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -68,6 +69,7 @@ th {
 }
 .App_mainCenterCanvas {
   display: flex;
+  flex-direction: column;
   gap: var(--spacers-dp4);
   height: 100%;
   margin: 0 var(--spacers-dp4) var(--spacers-dp4);
@@ -79,4 +81,22 @@ th {
 }
 .column-narrow {
   flex: 0 0 200px;
+}
+.layout {
+  display: flex;
+  flex: 1; /* Allow layout to take the remaining space */
+}
+.sidebar {
+  width: 200px; /* Fixed width for sidebar */
+  background-color: #f8f9fa; /* Sidebar background color */
+  padding: 15px;
+  border-right: 1px solid #dee2e6;
+  height: 100vh; /* Full height */
+  position: relative; /* Fixed position */
+  top: 0; /* Align to the top */
+}
+.table-container {
+  margin-left: 105px; /* Offset for sidebar width */
+  padding: 15px; /* Padding for table container */
+  flex: 1; /* Take the remaining space */
 }

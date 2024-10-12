@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import tracker from 'mark/api/tracker';
 import organisationUnits from 'mark/api/organisationUnits';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import Header from './Header'; // Adjust the path as necessary
+import Sidebar from './Sidebar'; // Adjust the path as necessary
 
 
 
@@ -14,7 +16,7 @@ const TrackedEntitiesTable = (props) => {
   const [trackedEntities, setInstances] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [orgUnitDetails, setOrgUnitDetails] = useState([]);
-
+ 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +27,7 @@ const TrackedEntitiesTable = (props) => {
       let details = {
         paging: false,
         trackedEntityType: props.trackedEntityType,
+        program: props.program,
       };
 
       if(tracker.useLegacyTrackerApi)
@@ -78,7 +81,7 @@ const TrackedEntitiesTable = (props) => {
     }).finally(()=>{
     })
       
-  }, [props.orgUnits, props.trackedEntityType]);
+  }, [props.orgUnits, props.trackedEntityType, props.program]);
 
 
   
@@ -200,70 +203,77 @@ const TrackedEntitiesTable = (props) => {
 
   return (
     <div className="App_mainCenterCanva">
-      <table {...getTableProps()} className="table table-striped table-bordered">
-        <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render('Header')}
-                  <span>
-                    {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
-                  </span>
-                </th>
+      <Header />
+      <div className="layout">
+        <Sidebar />
+        <div className="table-container">
+          <table {...getTableProps()} className="table table-striped table-bordered">
+            <thead>
+              {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map(column => (
+                    <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                      {column.render('Header')}
+                      <span>
+                        {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
+                      </span>
+                    </th>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map(row => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()} onClick={() => handleRowClick(row)} style={{ cursor: 'pointer' }}>
-                {row.cells.map(cell => (
-                  <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {page.map(row => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()} onClick={() => handleRowClick(row)} style={{ cursor: 'pointer' }}>
+                    {row.cells.map(cell => (
+                      <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
 
-      {/* Pagination Controls */}
-      <div className="pagination">
-        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-          {'<<'}
-        </button>
-        <button onClick={previousPage} disabled={!canPreviousPage}>
-          {'<'}
-        </button>
-        <span>
-          Page{' '}
-          <strong>
-            {state.pageIndex + 1} of {pageOptions.length}
-          </strong>
-        </span>
-        <button onClick={nextPage} disabled={!canNextPage}>
-          {'>'}
-        </button>
-        <button onClick={() => gotoPage(pageOptions.length - 1)} disabled={!canNextPage}>
-          {'>>'}
-        </button>
-        <select
-          value={state.pageSize}
-          onChange={e => {
-            setPageSize(Number(e.target.value));
-          }}
-        >
-          {[5, 10, 20, 50, 100, 200, 300, 400, 500, 1000].map(pageSize => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
+          {/* Pagination Controls */}
+          <div className="pagination">
+            <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+              {'<<'}
+            </button>
+            <button onClick={previousPage} disabled={!canPreviousPage}>
+              {'<'}
+            </button>
+            <span>
+              Page{' '}
+              <strong>
+                {state.pageIndex + 1} of {pageOptions.length}
+              </strong>
+            </span>
+            <button onClick={nextPage} disabled={!canNextPage}>
+              {'>'}
+            </button>
+            <button onClick={() => gotoPage(pageOptions.length - 1)} disabled={!canNextPage}>
+              {'>>'}
+            </button>
+            <select
+              value={state.pageSize}
+              onChange={e => {
+                setPageSize(Number(e.target.value));
+              }}
+            >
+              {[5, 10, 20, 50, 100, 200, 300, 400, 500, 1000].map(pageSize => (
+                <option key={pageSize} value={pageSize}>
+                  Show {pageSize}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
 
 export default TrackedEntitiesTable;
