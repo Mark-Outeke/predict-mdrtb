@@ -3,6 +3,7 @@ import tracker from 'mark/api/tracker';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTrackedEntity } from 'TrackedEntityContext';
+import Header from './Header';
 
 const TrackedEntityDetails = () => {
   const location = useLocation();
@@ -73,7 +74,7 @@ const TrackedEntityDetails = () => {
       const fetchPredictions = async () => {
         try {
           // Replace with your actual prediction fetching logic
-          const response = await fetch(`/api/predictions/${details.trackedEntityInstance}`);
+          const response = await fetch(`/PredictionComponent/${details.trackedEntityInstance}`);
           const predictionResult = await response.json();
           setPredictions(`Patient has a prediction percentage of ${predictionResult.percentage}% to develop MDR-TB, ${predictionResult.class}.`);
         } catch (error) {
@@ -93,6 +94,7 @@ const TrackedEntityDetails = () => {
   } else {
     return (
       <div className="container mt-4">
+        <Header />
         <h1>Patient's Dashboard</h1>
         
         <button className="btn btn-primary mb-3" onClick={() => navigate('/predictionProcessor/')}>MDRTB Prediction Score</button>

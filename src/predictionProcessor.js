@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import * as tf from '@tensorflow/tfjs';
+//import {TabularLime} from 'lime-js'; // Import LIME for tabular data
+//import * as tfvis from '@tensorflow/tfjs-vis';
 import { useTrackedEntity } from 'TrackedEntityContext'; // Import your existing context
-// eslint-disable-next-line
-//import LimeTabularExplainer from 'lime-js';
+import tracker from 'mark/api/tracker';
+
+
 
 const PredictionComponent = () => {
   const { trackedEntityData, updateTrackedEntity } = useTrackedEntity(); // Get tracked entity data from context
@@ -10,7 +13,14 @@ const PredictionComponent = () => {
   const [featureContributions, setFeatureContributions] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Track if predictions are running
   const [hasRunPredictions, setHasRunPredictions] = useState(false); // Track if predictions have been made
-
+  const [averagePrediction, setAveragePrediction] = useState([]);
+  const [highestAveragePrediction, sethighestAveragePrediction] = useState([]);
+  const [predictedClass, setPredictedClass] = useState('');
+  const [dataElementDisplayNames, setDataElementDisplayNames] = useState({}); // Mapping of IDs to display names
+  const [error, setError] = useState(null);
+  
+  
+  
   const runPrediction = useCallback(async () => {
     if (!trackedEntityData || hasRunPredictions) return; // Ensure there's data before processing
 
@@ -214,43 +224,77 @@ const PredictionComponent = () => {
       const model = await loadModel();
       if (model) {
           console.log('Running Predictions...');
-    
+        // Step 3: Initialize LIME explainer
+        
+        
+
         // Loop through each tensor input and make predictions
           const predictions = [];
+
           const contributions = []; // Store contributions for each prediction
-    
+
+          //const allDataElements = [...categoricalColumns, ...numericColumns];
+              
           for (let i = 0; i < tensorInputs.length; i++) {
             const inputTensor = tensorInputs[i]; // Create a tensor for the current row
-          
-        
-            
             const reshapedInput = tf.tensor(inputTensor).reshape([1, 1, 82]);
             console.log('length',reshapedInput.size); // Should be 82
             console.log('reshaped',reshapedInput.shape); // Should be [1, 1, 82]
-            
-            
-        
             const outputTensor = model.predict(reshapedInput);
-              // Get the prediction for the current row
-              
-            predictions.push(outputTensor.arraySync());
+              // Get the prediction for the current row 
+            const predictionArray = outputTensor.arraySync(); // Extract array
+            console.log(predictions);
 
             
-        
-              // Explain predictions for the current row
-          //const explanation = await explainPredictions([finalData[i]], model);
-          //contributions.push(explanation);
-      }
+              // If your model is binary classification with two outputs
+              // You may need to check the output shape
+              const predictionValue = predictionArray[0]; // Get the first output class probabilities
+
+              // For binary classification, usually, you only need the probability for class 1:
+              if (predictionValue.length === 2) {
+                  predictions.push(predictionValue[1]); // Assuming the second index corresponds to class 1
+              } else {
+                  predictions.push(predictionValue[0]); // Single output case
+              }
+            //contributions by feature. find appropriate way to get contribution by features**********************
     
+               
+
+                contributions.push(featureContributions); // Store contributions for current prediction
+              }
+
+      
+      const averagePrediction = predictions.reduce((acc, curr) => 
+        acc.map((val, idx) => val + curr[idx]), Array(predictions[0].length).fill(0)
+    ).map(val => val / predictions.length);
+    
+    //console.log('Single average prediction over all events:', averagePrediction);
+    // Find the index of the class with the highest average prediction
+    const highestPredictionIndex = averagePrediction.indexOf(Math.max(...averagePrediction));
+
+    // Get the highest average prediction value
+    const highestAveragePrediction = averagePrediction[highestPredictionIndex];
+    
+    //console.log(highestAveragePrediction);
+    
+    // Determine predicted class based on average prediction
+    const predictedClass = highestAveragePrediction[0] > 0.5 ? 'YES' : 'NO';
+    setPredictedClass(predictedClass)
+    console.log('Predicted Class:', predictedClass);
+  
+
       setPredictions(predictions);
       setFeatureContributions(contributions);
+      setAveragePrediction(averagePrediction);
+      setPredictedClass(predictedClass);
+      sethighestAveragePrediction(highestAveragePrediction);
 
       updateTrackedEntity({predictions});
       setIsLoading(false); // Mark predictions as complete
       setHasRunPredictions(true)
       return;}
       
-    }, [trackedEntityData,hasRunPredictions, updateTrackedEntity]);
+}, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureContributions]);
    
 
 useEffect(() => {
@@ -258,23 +302,76 @@ useEffect(() => {
      runPrediction();
   }
 },[trackedEntityData, hasRunPredictions, runPrediction]);
+// Function to fetch display names from API
+useEffect(() => {
+  const fetchDataElementDisplayNames = async () => {
+    try {
+      const response = await tracker.legacy.GetDataElementsNameByID({ paging: false });
+      const dataElements = response.data.dataElements;
+
+      if (!Array.isArray(dataElements)) {
+        throw new Error('Expected dataElements to be an array');
+      }
+
+      const displayNameMapping = {};
+      dataElements.forEach(element => {
+        displayNameMapping[element.id] = element.displayName;
+      });
+
+      setDataElementDisplayNames(displayNameMapping); // Store the mapping in state
+    } catch (error) {
+      console.error('Error fetching data element display names:', error);
+      setError('Failed to fetch data element display names');
+    }
+  };
+
+  fetchDataElementDisplayNames();
+}, []);
+
+// Mapping feature contributions to display names
+const mapFeatureContributionsToDisplayNames = (featureContributions) => {
+  if(!Array.isArray(featureContributions)){
+    return[];
+  }
+  return featureContributions.map(contribution => {
+    return contribution.map(value => ({
+      ...value,
+      featureDisplayName: dataElementDisplayNames[value.featureId] || `Unknown Feature (ID: ${value.featureId})` // Fallback to "Unknown" if not found
+    }));
+  });
+};
+
+const mappedFeatureContributions = mapFeatureContributionsToDisplayNames(featureContributions);
+
 
   return (
-    <div>
-      <h1>Predictions</h1>
-      {isLoading ? (
-        <p>Loading predictions...</p>
-      ) : (
-        <>
-          <ul>
-            {predictions.map((prediction, index) => (
-              <li key={index}>
-                Prediction {index + 1}: {JSON.stringify(prediction)}
-              </li>
-            ))}
-          </ul>
-          <h2>Feature Contributions</h2>
-          {featureContributions.map((contribution, index) => (
+  <div>
+    <h1>Predictions</h1>
+    {isLoading ? (
+      <p>Loading predictions...</p>
+    ) : error ? (
+      <p style={{ color: 'red' }}>{error}</p> // Display the error message
+    ) : (
+      <>
+        <p><strong>Average Prediction:</strong> {JSON.stringify(averagePrediction)}</p>
+        <p><strong>Final Prediction Probability:</strong> {highestAveragePrediction}</p>
+        <p><strong>Patient Likely to Develop MDRTB:</strong> {predictedClass}</p>
+
+        <h2>Predictions List</h2>
+        <ul>
+          {predictions.length > 0 ? (
+            predictions.map((prediction, index) => (
+              <li key={index}>Prediction {index + 1}: {prediction}</li>
+            ))
+          ) : (
+            <li>No predictions available.</li>
+          )}
+        </ul>
+
+        <h2>Feature Contributions</h2>
+        
+        {mappedFeatureContributions && mappedFeatureContributions.length > 0 ? (
+          mappedFeatureContributions.map((contribution, index) => (
             <div key={index}>
               <h3>Prediction {index + 1}</h3>
               <table border="1" cellPadding="5">
@@ -287,18 +384,21 @@ useEffect(() => {
                 <tbody>
                   {contribution.map((value, idx) => (
                     <tr key={idx}>
-                      <td>Feature {idx + 1}</td>
-                      <td>{value.toFixed(2)}</td>
+                      <td>{value.featureDisplayName} (ID: {value.featureId})</td>
+                      <td>{value.contribution}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          ))}
-        </>
-      )}
-    </div>
-  );
+          ))
+        ) : (
+          <p>No feature contributions available.</p>
+        )}
+      </>
+    )}
+  </div>
+);
 };
 
 export default PredictionComponent;
