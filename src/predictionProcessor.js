@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import * as tf from '@tensorflow/tfjs';
-//import {TabularLime} from 'lime-js'; // Import LIME for tabular data
-//import * as tfvis from '@tensorflow/tfjs-vis';
 import { useTrackedEntity } from 'TrackedEntityContext'; // Import your existing context
 import tracker from 'mark/api/tracker';
+
 
 
 
@@ -14,10 +13,11 @@ const PredictionComponent = () => {
   const [isLoading, setIsLoading] = useState(true); // Track if predictions are running
   const [hasRunPredictions, setHasRunPredictions] = useState(false); // Track if predictions have been made
   const [averagePrediction, setAveragePrediction] = useState([]);
-  const [highestAveragePrediction, sethighestAveragePrediction] = useState([]);
+  const [highestAveragePrediction, setHighestAveragePrediction] = useState([]);
   const [predictedClass, setPredictedClass] = useState('');
   const [dataElementDisplayNames, setDataElementDisplayNames] = useState({}); // Mapping of IDs to display names
   const [error, setError] = useState(null);
+  const [featureAttributions, setFeatureAttributions] = useState([]); 
   
   
   
@@ -195,9 +195,6 @@ const PredictionComponent = () => {
 
       return data;
     };
-
-  
-      
       const finalData = handleMissingValues(normalizedData);
     
       const extractTensorInputs = (finalData) => {
@@ -205,7 +202,7 @@ const PredictionComponent = () => {
         return finalData.map(row=> Object.values(row.data));
         
       };
-    
+    console.log('finalData:', finalData);
       // Assuming finalData is available and processed
       const tensorInputs = extractTensorInputs(finalData);
       console.log('tensorInputs:', tensorInputs);
@@ -214,55 +211,112 @@ const PredictionComponent = () => {
       const loadModel = async () => {
         try {
           const model = await tf.loadLayersModel('/model.json', {weights: 'weights.json'});
-          return model;
+            model.compile({
+            optimizer: 'adam', // Specify your optimizer
+            loss: 'categoricalCrossentropy', // Use appropriate loss based on your model
+            metrics: ['accuracy'], // Metrics for tracking
+          });return model;
         } catch (error) {
           console.error('Error loading the TensorFlow model:', error);
           return null;
         }
       };
+    
       // Load TensorFlow model
       const model = await loadModel();
       if (model) {
           console.log('Running Predictions...');
-        // Step 3: Initialize LIME explainer
-        
-        
-
         // Loop through each tensor input and make predictions
           const predictions = [];
-
-          const contributions = []; // Store contributions for each prediction
-
-          //const allDataElements = [...categoricalColumns, ...numericColumns];
-              
+                     
           for (let i = 0; i < tensorInputs.length; i++) {
             const inputTensor = tensorInputs[i]; // Create a tensor for the current row
             const reshapedInput = tf.tensor(inputTensor).reshape([1, 1, 82]);
-            console.log('length',reshapedInput.size); // Should be 82
-            console.log('reshaped',reshapedInput.shape); // Should be [1, 1, 82]
+            console.log('reshaped prediction input:',reshapedInput);
+            
             const outputTensor = model.predict(reshapedInput);
               // Get the prediction for the current row 
             const predictionArray = outputTensor.arraySync(); // Extract array
-            console.log(predictions);
-
-            
               // If your model is binary classification with two outputs
               // You may need to check the output shape
-              const predictionValue = predictionArray[0]; // Get the first output class probabilities
+            const predictionValue = predictionArray[0]; // Get the first output class probabilities
 
               // For binary classification, usually, you only need the probability for class 1:
-              if (predictionValue.length === 2) {
-                  predictions.push(predictionValue[1]); // Assuming the second index corresponds to class 1
-              } else {
-                  predictions.push(predictionValue[0]); // Single output case
-              }
-            //contributions by feature. find appropriate way to get contribution by features**********************
-    
-               
+            predictions.push(predictionValue.length === 2 ? predictionValue[1] : predictionValue[0]);
+            
+            const reshapedIGInput = reshapedInput.clone() 
+            console.log('reshapedIGInput',reshapedIGInput);
+           // use of Intergrated gradients for feature importance perprediction 
+           const runIntegratedGradients = async (model, reshapedIGInput, steps = 50) => {
+            const baseline = tf.zeros([1, 1, 82]); 
+            const alphas = tf.linspace(0, 1, steps);
+            const alphaValues = alphas.dataSync(); // Get the array of alpha values
+            console.log('still a tensor:',reshapedInput);
+        
+            const interpolatedInputs = alphaValues.map(alpha => {
+              reshapedIGInput.data().then(data => {
+                console.log('reshapedInput data:', data);
+                if (data.some(value => isNaN(value))) {
+                    console.error('reshapedIGInput contains NaN values.');
+                }
+            });
+            
+            baseline.data().then(data => {
+                console.log('baseline data:', data);
+                if (data.some(value => isNaN(value))) {
+                    console.error('baseline contains NaN values.');
+                }
+            });
+              const newInput = tf.add(baseline, tf.mul(alpha, tf.sub(reshapedIGInput, baseline)));
+             
+              newInput.data().then(data => {
+                if (data.some(value => isNaN(value))) {
+                    console.error('newInput contains NaN values:', data);
+                }});
+                
+                console.log('baseline IG tensor:', baseline);
+                console.log('baseline IG tensor shape:', baseline.shape);
+                console.log('reshapedInput IG tensor?', reshapedIGInput);
+                console.log('reshapedInput IG tensor shape:', reshapedIGInput.shape);
+                console.log('New Input values:', newInput.arraySync());
+                           
+              // Assuming input tensor has a shape of [numFeatures] and you want to add a sequence length of 1
+              const reshapedNewInput = newInput.reshape([1, 1, 82]);// Shape: [1, 1,  numFeatures]  
+              console.log('reshaped new Input IG tensor shape:', reshapedNewInput.shape);            
+              return reshapedNewInput;
+           });
+          console.log('interpolatedInputs:',interpolatedInputs);
+          
+            let gradientsSum = tf.zerosLike(baseline);
+            for (const interpolatedInput of interpolatedInputs) {
+              if (interpolatedInput instanceof tf.Tensor) {
+                  console.log('Interpolated Input Shape:', interpolatedInput.shape);
+                  console.log('Interpolated Input Shape:', interpolatedInput.shape);
+                  console.log('Interpolated Input:', interpolatedInput); // Log the tensor itself
+                } else {
+                  console.error('Interpolated input is not a tensor or is undefined:', interpolatedInput);
+                      }
+        
+              const gradients = tf.variableGrads(() => model.predict(interpolatedInput));
+              gradientsSum = tf.add(gradientsSum, gradients.grads);
+            }
+        
+            const avgGradients = gradientsSum.div(steps);
+            const integratedGradients = tf.mul(avgGradients, reshapedIGInput.sub(baseline));
+            return integratedGradients.arraySync();
+            
+          }; 
+      
+          //contributions by feature. find appropriate way to get contribution by features**********************
+        // Calculate Integrated Gradients
+          const baseline = tf.zerosLike(inputTensor); // Baseline input
+          const igValues = await runIntegratedGradients(model, reshapedIGInput, baseline);
+          featureAttributions.push(igValues); // Store IG results
+              
+        
+        };   
 
-                contributions.push(featureContributions); // Store contributions for current prediction
-              }
-
+          
       
       const averagePrediction = predictions.reduce((acc, curr) => 
         acc.map((val, idx) => val + curr[idx]), Array(predictions[0].length).fill(0)
@@ -271,37 +325,35 @@ const PredictionComponent = () => {
     //console.log('Single average prediction over all events:', averagePrediction);
     // Find the index of the class with the highest average prediction
     const highestPredictionIndex = averagePrediction.indexOf(Math.max(...averagePrediction));
-
     // Get the highest average prediction value
     const highestAveragePrediction = averagePrediction[highestPredictionIndex];
-    
-    //console.log(highestAveragePrediction);
-    
     // Determine predicted class based on average prediction
     const predictedClass = highestAveragePrediction[0] > 0.5 ? 'YES' : 'NO';
     setPredictedClass(predictedClass)
     console.log('Predicted Class:', predictedClass);
   
 
-      setPredictions(predictions);
-      setFeatureContributions(contributions);
-      setAveragePrediction(averagePrediction);
-      setPredictedClass(predictedClass);
-      sethighestAveragePrediction(highestAveragePrediction);
+    setPredictions(predictions);
+    //setFeatureContributions(importanceScores);
+    setAveragePrediction(averagePrediction);
+    setPredictedClass(predictedClass);
+    setHighestAveragePrediction(highestAveragePrediction);
+    setFeatureAttributions(featureAttributions); // Set the calculated feature attributions
 
-      updateTrackedEntity({predictions});
-      setIsLoading(false); // Mark predictions as complete
-      setHasRunPredictions(true)
-      return;}
-      
-}, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureContributions]);
+    updateTrackedEntity({predictions});
+    setIsLoading(false); // Mark predictions as complete
+    setHasRunPredictions(true)
+     
+    return;}
+}, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureAttributions])
    
 
 useEffect(() => {
   if (trackedEntityData && !hasRunPredictions ) {
      runPrediction();
-  }
+  };
 },[trackedEntityData, hasRunPredictions, runPrediction]);
+
 // Function to fetch display names from API
 useEffect(() => {
   const fetchDataElementDisplayNames = async () => {
