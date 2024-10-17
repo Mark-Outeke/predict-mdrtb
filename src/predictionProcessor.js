@@ -18,6 +18,8 @@ const PredictionComponent = () => {
   const [dataElementDisplayNames, setDataElementDisplayNames] = useState({}); // Mapping of IDs to display names
   const [error, setError] = useState(null);
   const [featureAttributions, setFeatureAttributions] = useState([]); 
+  const [igValues, setIgValues] = useState([]);
+
   
   
   
@@ -203,11 +205,11 @@ const PredictionComponent = () => {
         
       };
     console.log('finalData:', finalData);
+
+    const featureNames = Object.keys(finalData[0].data);
       // Assuming finalData is available and processed
       const tensorInputs = extractTensorInputs(finalData);
       console.log('tensorInputs:', tensorInputs);
-      
-      
       const loadModel = async () => {
         try {
           const model = await tf.loadLayersModel('/model.json', {weights: 'weights.json'});
@@ -228,11 +230,12 @@ const PredictionComponent = () => {
           console.log('Running Predictions...');
         // Loop through each tensor input and make predictions
           const predictions = [];
+          
                      
           for (let i = 0; i < tensorInputs.length; i++) {
             const inputTensor = tensorInputs[i]; // Create a tensor for the current row
             const reshapedInput = tf.tensor(inputTensor).reshape([1, 1, 82]);
-            console.log('reshaped prediction input:',reshapedInput);
+            //console.log('reshaped prediction input:',reshapedInput);
             
             const outputTensor = model.predict(reshapedInput);
               // Get the prediction for the current row 
@@ -245,13 +248,13 @@ const PredictionComponent = () => {
             predictions.push(predictionValue.length === 2 ? predictionValue[1] : predictionValue[0]);
             
             const reshapedIGInput = reshapedInput.clone() 
-            console.log('reshapedIGInput',reshapedIGInput);
+            //console.log('reshapedIGInput',reshapedIGInput);
            // use of Intergrated gradients for feature importance perprediction 
            const runIntegratedGradients = async (model, reshapedIGInput, steps = 50) => {
             const baseline = tf.zeros([1, 1, 82]); 
             const alphas = tf.linspace(0, 1, steps);
             const alphaValues = alphas.dataSync(); // Get the array of alpha values
-            console.log('still a tensor:',reshapedInput);
+            //console.log('still a tensor:',reshapedInput);
         
             const interpolatedInputs = alphaValues.map(alpha => {
               reshapedIGInput.data().then(data => {
@@ -267,32 +270,25 @@ const PredictionComponent = () => {
                     console.error('baseline contains NaN values.');
                 }
             });
-              const newInput = tf.add(baseline, tf.mul(alpha, tf.sub(reshapedIGInput, baseline)));
+            const newInput = tf.add(baseline, tf.mul(alpha, tf.sub(reshapedIGInput, baseline)));
              
               newInput.data().then(data => {
                 if (data.some(value => isNaN(value))) {
                     console.error('newInput contains NaN values:', data);
                 }});
                 
-                console.log('baseline IG tensor:', baseline);
-                console.log('baseline IG tensor shape:', baseline.shape);
-                console.log('reshapedInput IG tensor?', reshapedIGInput);
-                console.log('reshapedInput IG tensor shape:', reshapedIGInput.shape);
-                console.log('New Input values:', newInput.arraySync());
-                           
+                
               // Assuming input tensor has a shape of [numFeatures] and you want to add a sequence length of 1
               const reshapedNewInput = newInput.reshape([1, 1, 82]);// Shape: [1, 1,  numFeatures]  
               console.log('reshaped new Input IG tensor shape:', reshapedNewInput.shape);            
               return reshapedNewInput;
            });
-          console.log('interpolatedInputs:',interpolatedInputs);
+          //console.log('interpolatedInputs:',interpolatedInputs);
           
             let gradientsSum = tf.zerosLike(baseline);
             for (const interpolatedInput of interpolatedInputs) {
               if (interpolatedInput instanceof tf.Tensor) {
-                  console.log('Interpolated Input Shape:', interpolatedInput.shape);
-                  console.log('Interpolated Input Shape:', interpolatedInput.shape);
-                  console.log('Interpolated Input:', interpolatedInput); // Log the tensor itself
+                  
                 } else {
                   console.error('Interpolated input is not a tensor or is undefined:', interpolatedInput);
                       }
@@ -303,7 +299,14 @@ const PredictionComponent = () => {
         
             const avgGradients = gradientsSum.div(steps);
             const integratedGradients = tf.mul(avgGradients, reshapedIGInput.sub(baseline));
+
+            const igValuesArray = integratedGradients.arraySync();
+            
+            
+            console.log('Integrated Gradients:', igValuesArray);
+            
             return integratedGradients.arraySync();
+            
             
           }; 
       
@@ -311,8 +314,19 @@ const PredictionComponent = () => {
         // Calculate Integrated Gradients
           const baseline = tf.zerosLike(inputTensor); // Baseline input
           const igValues = await runIntegratedGradients(model, reshapedIGInput, baseline);
+
+          const mappedIGValues = igValues[0].map((value, index) => ({
+            featureId: featureNames[index] || `Unknown Feature ${index}`,
+            contribution: value
+          }));
+        
+          setIgValues(mappedIGValues);
           featureAttributions.push(igValues); // Store IG results
-              
+          console.log('featureAttributions:', featureAttributions);
+          setFeatureContributions(igValues)
+          //console.log('IG Values:', igValues);
+          console.log ('mapped IG values:', mappedIGValues)
+
         
         };   
 
@@ -339,19 +353,18 @@ const PredictionComponent = () => {
     setPredictedClass(predictedClass);
     setHighestAveragePrediction(highestAveragePrediction);
     setFeatureAttributions(featureAttributions); // Set the calculated feature attributions
-
     updateTrackedEntity({predictions});
     setIsLoading(false); // Mark predictions as complete
     setHasRunPredictions(true)
-     
-    return;}
+
+    }
 }, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureAttributions])
    
 
 useEffect(() => {
-  if (trackedEntityData && !hasRunPredictions ) {
+  if (trackedEntityData?.enrollments && !hasRunPredictions ) {
      runPrediction();
-  };
+  }
 },[trackedEntityData, hasRunPredictions, runPrediction]);
 
 // Function to fetch display names from API
@@ -367,6 +380,7 @@ useEffect(() => {
 
       const displayNameMapping = {};
       dataElements.forEach(element => {
+        //console.log('Data Elemen:', element);
         displayNameMapping[element.id] = element.displayName;
       });
 
@@ -381,20 +395,12 @@ useEffect(() => {
 }, []);
 
 // Mapping feature contributions to display names
-const mapFeatureContributionsToDisplayNames = (featureContributions) => {
-  if(!Array.isArray(featureContributions)){
-    return[];
-  }
-  return featureContributions.map(contribution => {
-    return contribution.map(value => ({
-      ...value,
-      featureDisplayName: dataElementDisplayNames[value.featureId] || `Unknown Feature (ID: ${value.featureId})` // Fallback to "Unknown" if not found
-    }));
-  });
-};
-
-const mappedFeatureContributions = mapFeatureContributionsToDisplayNames(featureContributions);
-
+const mappedFeatureContributions = featureContributions.map(contribution => 
+  contribution.map(value => ({
+    ...value,
+    featureDisplayName: dataElementDisplayNames[value.featureId] || `Unknown Feature (ID: ${value.featureId})`
+  }))
+);
 
   return (
   <div>
@@ -408,9 +414,24 @@ const mappedFeatureContributions = mapFeatureContributionsToDisplayNames(feature
         <p><strong>Average Prediction:</strong> {JSON.stringify(averagePrediction)}</p>
         <p><strong>Final Prediction Probability:</strong> {highestAveragePrediction}</p>
         <p><strong>Patient Likely to Develop MDRTB:</strong> {predictedClass}</p>
-
-        <h2>Predictions List</h2>
+        
+        {igValues.length > 0 && (
+          <h2>Integrated Gradients Values</h2>
+        )}
+        {featureAttributions.map((value, index) => (
+          <div key={index}>
+            <h3>Prediction {index + 1} IG Values</h3>
+            <ul>
+              {igValues.map((igValues, idx) => (
+                <li key={idx}>
+                  Feature : {value.featureId}, Contribution: {value.contribution}
+                </li>
+               ))}
+            </ul>
+            </div>
+        ))}
         <ul>
+        <h2>Predictions List</h2>
           {predictions.length > 0 ? (
             predictions.map((prediction, index) => (
               <li key={index}>Prediction {index + 1}: {prediction}</li>
@@ -422,7 +443,7 @@ const mappedFeatureContributions = mapFeatureContributionsToDisplayNames(feature
 
         <h2>Feature Contributions</h2>
         
-        {mappedFeatureContributions && mappedFeatureContributions.length > 0 ? (
+        {featureAttributions.length > 0 ? (
           mappedFeatureContributions.map((contribution, index) => (
             <div key={index}>
               <h3>Prediction {index + 1}</h3>
