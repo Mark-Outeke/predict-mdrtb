@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTrackedEntity } from 'TrackedEntityContext';
 import Header from './Header';
+//import {highestAveragePrediction} from 'predictionProcessor';
 
 const TrackedEntityDetails = () => {
   const location = useLocation();
@@ -34,6 +35,7 @@ const TrackedEntityDetails = () => {
         });
 
         setDataElementDisplayNames(displayNameMapping); // Store the mapping in state
+        
       } catch (error) {
         console.error('Error fetching data element display names:', error);
         setError('Failed to fetch data element display names');
@@ -97,7 +99,7 @@ const TrackedEntityDetails = () => {
         <Header />
         <h1>Patient's Dashboard</h1>
         
-        <button className="btn btn-primary mb-3" onClick={() => navigate('/predictionProcessor/')}>MDRTB Prediction Score</button>
+        <button className="btn btn-primary mb-3" onClick={() => navigate('/predictionProcessor/')}> click to view MDRTB Prediction Score</button>
         {predictions && <div className="alert alert-info">{predictions}</div>} {/* Render predictions message */}
         {details.enrollments && details.enrollments.length > 0 ? (
           <table className="table table-bordered table-striped">

@@ -18,9 +18,35 @@ const PredictionComponent = () => {
   const [dataElementDisplayNames, setDataElementDisplayNames] = useState({}); // Mapping of IDs to display names
   const [error, setError] = useState(null);
   const [featureAttributions, setFeatureAttributions] = useState([]); 
-  const [igValues, setIgValues] = useState([]);
-
+  //const [igValues, setIgValues] = useState([]);
+  const [mappedIGValues, setMappedIGValues] = useState([]);
+  const [finalAveragedIGValues, setFinalAVerageIGValues] = useState ([]);
   
+  useEffect(() => {
+    const fetchDataElementDisplayNames = async () => {
+      try {
+        const response = await tracker.legacy.GetDataElementsNameByID({ paging: false });
+        const dataElements = response.data.dataElements;
+  
+        if (!Array.isArray(dataElements)) {
+          throw new Error('Expected dataElements to be an array');
+        }
+        const displayNameMapping = {};
+        dataElements.forEach(element => {
+          //console.log('Data Element:', element);
+          displayNameMapping[element.id] = element.displayName;
+        });
+  
+        setDataElementDisplayNames(displayNameMapping); // Store the mapping in state
+        
+      } catch (error) {
+        console.error('Error fetching data element display names:', error);
+        setError('Failed to fetch data element display names');
+      }
+    };
+  
+    fetchDataElementDisplayNames();
+  }, []);
   
   
   const runPrediction = useCallback(async () => {
@@ -230,6 +256,7 @@ const PredictionComponent = () => {
           console.log('Running Predictions...');
         // Loop through each tensor input and make predictions
           const predictions = [];
+          const allMappedIGValues =[]; //array to store all mapped IG values for averaging
           
                      
           for (let i = 0; i < tensorInputs.length; i++) {
@@ -271,16 +298,13 @@ const PredictionComponent = () => {
                 }
             });
             const newInput = tf.add(baseline, tf.mul(alpha, tf.sub(reshapedIGInput, baseline)));
-             
-              newInput.data().then(data => {
+             newInput.data().then(data => {
                 if (data.some(value => isNaN(value))) {
                     console.error('newInput contains NaN values:', data);
                 }});
-                
-                
-              // Assuming input tensor has a shape of [numFeatures] and you want to add a sequence length of 1
+                // Assuming input tensor has a shape of [numFeatures] and you want to add a sequence length of 1
               const reshapedNewInput = newInput.reshape([1, 1, 82]);// Shape: [1, 1,  numFeatures]  
-              console.log('reshaped new Input IG tensor shape:', reshapedNewInput.shape);            
+              //console.log('reshaped new Input IG tensor shape:', reshapedNewInput.shape);            
               return reshapedNewInput;
            });
           //console.log('interpolatedInputs:',interpolatedInputs);
@@ -299,39 +323,60 @@ const PredictionComponent = () => {
         
             const avgGradients = gradientsSum.div(steps);
             const integratedGradients = tf.mul(avgGradients, reshapedIGInput.sub(baseline));
-
-            const igValuesArray = integratedGradients.arraySync();
-            
-            
-            console.log('Integrated Gradients:', igValuesArray);
-            
+            //const igValuesArray = integratedGradients.arraySync();
+            //console.log('Integrated Gradients:', igValuesArray);
             return integratedGradients.arraySync();
-            
-            
           }; 
-      
-          //contributions by feature. find appropriate way to get contribution by features**********************
+        //contributions by feature. find appropriate way to get contribution by features**********************
         // Calculate Integrated Gradients
           const baseline = tf.zerosLike(inputTensor); // Baseline input
           const igValues = await runIntegratedGradients(model, reshapedIGInput, baseline);
+          const contributionsArray = igValues[0][0];
 
-          const mappedIGValues = igValues[0].map((value, index) => ({
-            featureId: featureNames[index] || `Unknown Feature ${index}`,
-            contribution: value
-          }));
-        
-          setIgValues(mappedIGValues);
-          featureAttributions.push(igValues); // Store IG results
-          console.log('featureAttributions:', featureAttributions);
-          setFeatureContributions(igValues)
-          //console.log('IG Values:', igValues);
-          console.log ('mapped IG values:', mappedIGValues)
-
-        
-        };   
-
+          // Map contributions to feature IDs
+          const mappedIGValues = contributionsArray.map((value, index) => {
+            const featureId = featureNames[index] || `Unknown Feature ${index}`;
+            const displayName = dataElementDisplayNames[featureId] || featureId; // Use display name if available
+            return {
+              featureId: displayName,
+              contribution: value
+            };
+          });
           
-      
+          allMappedIGValues.push(mappedIGValues);
+
+          // Calculate final average contribution Set state with averaged value
+          // You can also set this result to state or use it as needed
+          // or whatever you wish to do with it
+          //setIgValues(igValues);
+          
+          featureAttributions.push(igValues); // Store IG results
+          //console.log('featureAttributions:', featureAttributions);
+          //setFeatureContributions(featureAttributions);
+          //console.log('IG Values:', igValues);
+          //console.log ('mapped IG values:', mappedIGValues);
+          //console.log('IGvalues:', igValues);
+          
+        };
+    const averagedMappedIGValues = allMappedIGValues.reduce((acc, curr) => {
+      curr.forEach((feature, index) => {
+        if (!acc[index]) {
+          acc[index] = { featureId: feature.featureId, totalContribution: 0, count: 0 };
+        }
+        acc[index].totalContribution += feature.contribution;
+        acc[index].count += 1;
+      });
+      return acc;
+    }, []);
+    const finalAveragedIGValues = averagedMappedIGValues.map(feature => {
+      const displayName = dataElementDisplayNames[feature.featureId] || feature.featureId;
+      return{
+      featureId: displayName,
+      contribution: feature.totalContribution / feature.count
+      };
+    }).filter(feature => feature.contribution > 0);
+  
+    console.log('Final Averaged IG Values:', finalAveragedIGValues);
       const averagePrediction = predictions.reduce((acc, curr) => 
         acc.map((val, idx) => val + curr[idx]), Array(predictions[0].length).fill(0)
     ).map(val => val / predictions.length);
@@ -343,12 +388,13 @@ const PredictionComponent = () => {
     const highestAveragePrediction = averagePrediction[highestPredictionIndex];
     // Determine predicted class based on average prediction
     const predictedClass = highestAveragePrediction[0] > 0.5 ? 'YES' : 'NO';
+    
     setPredictedClass(predictedClass)
     console.log('Predicted Class:', predictedClass);
   
-
+    setFinalAVerageIGValues(finalAveragedIGValues);
     setPredictions(predictions);
-    //setFeatureContributions(importanceScores);
+    setFeatureContributions(mappedIGValues);
     setAveragePrediction(averagePrediction);
     setPredictedClass(predictedClass);
     setHighestAveragePrediction(highestAveragePrediction);
@@ -358,7 +404,7 @@ const PredictionComponent = () => {
     setHasRunPredictions(true)
 
     }
-}, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureAttributions])
+}, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureAttributions,mappedIGValues,dataElementDisplayNames])
    
 
 useEffect(() => {
@@ -368,41 +414,21 @@ useEffect(() => {
 },[trackedEntityData, hasRunPredictions, runPrediction]);
 
 // Function to fetch display names from API
-useEffect(() => {
-  const fetchDataElementDisplayNames = async () => {
-    try {
-      const response = await tracker.legacy.GetDataElementsNameByID({ paging: false });
-      const dataElements = response.data.dataElements;
 
-      if (!Array.isArray(dataElements)) {
-        throw new Error('Expected dataElements to be an array');
-      }
-
-      const displayNameMapping = {};
-      dataElements.forEach(element => {
-        //console.log('Data Elemen:', element);
-        displayNameMapping[element.id] = element.displayName;
-      });
-
-      setDataElementDisplayNames(displayNameMapping); // Store the mapping in state
-    } catch (error) {
-      console.error('Error fetching data element display names:', error);
-      setError('Failed to fetch data element display names');
-    }
-  };
-
-  fetchDataElementDisplayNames();
-}, []);
 
 // Mapping feature contributions to display names
-const mappedFeatureContributions = featureContributions.map(contribution => 
-  contribution.map(value => ({
-    ...value,
-    featureDisplayName: dataElementDisplayNames[value.featureId] || `Unknown Feature (ID: ${value.featureId})`
-  }))
-);
+useEffect(() => {
+  const mappedIGValues = featureContributions.map(contribution => 
+    contribution.map(value => ({
+      ...value,
+      featureDisplayName: dataElementDisplayNames[value.featureId] || `Unknown Feature (ID: ${value.featureId})`
+    }))
+  );
+   setMappedIGValues(mappedIGValues); // Store the mapped values
+}, [featureContributions, dataElementDisplayNames]); // Add dependencies
+const sortedAveragedIGValues = finalAveragedIGValues.sort((a, b) => b.contribution - a.contribution);
 
-  return (
+return (
   <div>
     <h1>Predictions</h1>
     {isLoading ? (
@@ -414,64 +440,82 @@ const mappedFeatureContributions = featureContributions.map(contribution =>
         <p><strong>Average Prediction:</strong> {JSON.stringify(averagePrediction)}</p>
         <p><strong>Final Prediction Probability:</strong> {highestAveragePrediction}</p>
         <p><strong>Patient Likely to Develop MDRTB:</strong> {predictedClass}</p>
-        
-        {igValues.length > 0 && (
-          <h2>Integrated Gradients Values</h2>
+
+        {/* Display the filtered integrated gradients values in a table */}
+        {sortedAveragedIGValues.length > 0 && (
+          <div>
+            <h2>Filtered Integrated Gradients Values</h2>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ border: '1px solid black', padding: '8px' }}>Feature</th>
+                  <th style={{ border: '1px solid black', padding: '8px' }}>Contribution</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedAveragedIGValues.map((feature, index) => (
+                  <tr key={index}>
+                    <td style={{ border: '1px solid black', padding: '8px' }}>
+                      {feature.featureId || `Unknown Feature (ID: ${feature.featureId})`}
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '8px' }}>
+                      {feature.contribution.toFixed(3)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-        {featureAttributions.map((value, index) => (
-          <div key={index}>
-            <h3>Prediction {index + 1} IG Values</h3>
-            <ul>
-              {igValues.map((igValues, idx) => (
-                <li key={idx}>
-                  Feature : {value.featureId}, Contribution: {value.contribution}
-                </li>
-               ))}
-            </ul>
-            </div>
-        ))}
-        <ul>
+
         <h2>Predictions List</h2>
-          {predictions.length > 0 ? (
-            predictions.map((prediction, index) => (
-              <li key={index}>Prediction {index + 1}: {prediction}</li>
-            ))
-          ) : (
-            <li>No predictions available.</li>
-          )}
-        </ul>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={{ border: '1px solid black', padding: '8px' }}>Prediction Index</th>
+              <th style={{ border: '1px solid black', padding: '8px' }}>Prediction Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {predictions.length > 0 ? (
+              predictions.map((prediction, index) => (
+                <tr key={index}>
+                  <td style={{ border: '1px solid black', padding: '8px' }}>{index + 1}</td>
+                  <td style={{ border: '1px solid black', padding: '8px' }}>{prediction}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={2} style={{ border: '1px solid black', padding: '8px' }}>No predictions available.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
 
         <h2>Feature Contributions</h2>
-        
-        {featureAttributions.length > 0 ? (
-          mappedFeatureContributions.map((contribution, index) => (
-            <div key={index}>
-              <h3>Prediction {index + 1}</h3>
-              <table border="1" cellPadding="5">
-                <thead>
-                  <tr>
-                    <th>Feature</th>
-                    <th>Contribution</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {contribution.map((value, idx) => (
-                    <tr key={idx}>
-                      <td>{value.featureDisplayName} (ID: {value.featureId})</td>
-                      <td>{value.contribution}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))
+        {featureContributions.length > 0 ? (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ border: '1px solid black', padding: '8px' }}>Feature ID</th>
+                <th style={{ border: '1px solid black', padding: '8px' }}>Contribution</th>
+              </tr>
+            </thead>
+            <tbody>
+              {featureContributions.map((feature, index) => (
+                <tr key={index}>
+                  <td style={{ border: '1px solid black', padding: '8px' }}><strong>{feature.featureId}</strong></td>
+                  <td style={{ border: '1px solid black', padding: '8px' }}>{feature.contribution.toFixed(4)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : (
-          <p>No feature contributions available.</p>
+          <p>No contributions available.</p>
         )}
       </>
     )}
   </div>
 );
 };
-
 export default PredictionComponent;
