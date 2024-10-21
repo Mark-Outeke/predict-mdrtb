@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import { useTrackedEntity } from 'TrackedEntityContext'; // Import your existing context
 import tracker from 'mark/api/tracker';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
@@ -25,7 +26,9 @@ const PredictionComponent = () => {
   useEffect(() => {
     const fetchDataElementDisplayNames = async () => {
       try {
-        const response = await tracker.legacy.GetDataElementsNameByID({ paging: false });
+        const response = await tracker.legacy.GetDataElementsNameByID({ 
+          paging: false
+         });
         const dataElements = response.data.dataElements;
   
         if (!Array.isArray(dataElements)) {
@@ -49,7 +52,7 @@ const PredictionComponent = () => {
   }, []);
   
   
-  const runPrediction = useCallback(async () => {
+   const runPrediction = useCallback(async () => {
     if (!trackedEntityData || hasRunPredictions) return; // Ensure there's data before processing
 
     // Use trackedEntityData from context
@@ -57,7 +60,7 @@ const PredictionComponent = () => {
 
     // Step 1: Extract data elements for categorical and numeric columns
     const categoricalColumns = [
-      'FZMwpP1ncnZ', 'vvlAUOFU1lc', 'WqWIsCuYw14',
+      'FZMwpP1ncnZ', 'vvlAUOFU1lc', 'WqWIsCuYw14', 'sVFokCQ8LTV', 'omFhxVHAHW8', 
       'G0m1TnJ9CaB', 'OZkvrZWZL0u', 'zJWyXO06Rhi', 'luQQ9zNTgFM', 'x7uZB9y0Qey',
       'aNj8BNicATN', 'pYsPUUxPn3v', 'FklL99yLd3h', 'EeE2uJluiAY', 'pg6UUMn87eM',
       'H85OvvFGG6i', 'b801bG8cIxt', 't6qq4TXSE7n', 'Wbp0DL9fQYj', 'DHPzkmTcDUv',
@@ -70,7 +73,7 @@ const PredictionComponent = () => {
       'Jl3oWFGGt1U', 'pDoTShM62yi', 'RTKE58980U7', 'IGv6SjkM162', 'fOnOoUvD03d',
       'QzfjeqlwN2c', 'ig3ZDT8Mgus', 'nVaN4Cpoe9Z', 'BQ2qwbH5WXi', 'KAykkHp1p2F',
       'lpJPqjVUToo', 'Aw9p1CCIkqL', 'pD0tc8UxyGg', 'fhEVXFPNNUc',
-      'F5P1buF4RHP', 'XzNqEEXo00j', 'Ep0hN5HdQKS', 'omFhxVHAHW8', 'sVFokCQ8LTV',
+      'F5P1buF4RHP', 'XzNqEEXo00j', 'Ep0hN5HdQKS', 
     ]; // Replace with actual IDs
 
     const numericColumns = [
@@ -110,7 +113,7 @@ const PredictionComponent = () => {
       }
 
       // Log the extracted data
-      console.log('Extracted Data:', extractedData);
+      //console.log('Extracted Data:', extractedData);
 
       // Initialize processedData as an array to store events
       const processedData = [];
@@ -129,14 +132,14 @@ const PredictionComponent = () => {
         processedData.push({ event: eventName, data: eventEntry });
       });
 
-      console.log('Processed Data per Event:', processedData); // Log the new structured output
+      //console.log('Processed Data per Event:', processedData); // Log the new structured output
 
       return processedData; // Return the consolidated data
     };
 
     // Extract data elements from jsonData
     const processedData = extractDataElements(jsonData, categoricalColumns, numericColumns);
-    console.log('Final Processed Data:', processedData);
+    //console.log('Final Processed Data:', processedData);
 
     if (!Array.isArray(processedData) || processedData.length === 0) {
       console.error("Invalid processed data structure:", processedData);
@@ -230,12 +233,12 @@ const PredictionComponent = () => {
         return finalData.map(row=> Object.values(row.data));
         
       };
-    console.log('finalData:', finalData);
+    //console.log('finalData:', finalData);
 
     const featureNames = Object.keys(finalData[0].data);
       // Assuming finalData is available and processed
       const tensorInputs = extractTensorInputs(finalData);
-      console.log('tensorInputs:', tensorInputs);
+      //console.log('tensorInputs:', tensorInputs);
       const loadModel = async () => {
         try {
           const model = await tf.loadLayersModel('/model.json', {weights: 'weights.json'});
@@ -327,7 +330,7 @@ const PredictionComponent = () => {
             //console.log('Integrated Gradients:', igValuesArray);
             return integratedGradients.arraySync();
           }; 
-        //contributions by feature. find appropriate way to get contribution by features**********************
+        //contributions by feature. find appropriate way to get contribution by features*********
         // Calculate Integrated Gradients
           const baseline = tf.zerosLike(inputTensor); // Baseline input
           const igValues = await runIntegratedGradients(model, reshapedIGInput, baseline);
@@ -376,7 +379,7 @@ const PredictionComponent = () => {
       };
     }).filter(feature => feature.contribution > 0);
   
-    console.log('Final Averaged IG Values:', finalAveragedIGValues);
+    //console.log('Final Averaged IG Values:', finalAveragedIGValues);
       const averagePrediction = predictions.reduce((acc, curr) => 
         acc.map((val, idx) => val + curr[idx]), Array(predictions[0].length).fill(0)
     ).map(val => val / predictions.length);
@@ -404,7 +407,8 @@ const PredictionComponent = () => {
     setHasRunPredictions(true)
 
     }
-}, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureAttributions,mappedIGValues,dataElementDisplayNames])
+}, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureAttributions,mappedIGValues,dataElementDisplayNames]);
+
    
 
 useEffect(() => {
@@ -445,7 +449,7 @@ return (
         {sortedAveragedIGValues.length > 0 && (
           <div>
             <h2>Filtered Integrated Gradients Values</h2>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className="table table-bordered table-striped">
               <thead>
                 <tr>
                   <th style={{ border: '1px solid black', padding: '8px' }}>Feature</th>
@@ -491,28 +495,6 @@ return (
             )}
           </tbody>
         </table>
-
-        <h2>Feature Contributions</h2>
-        {featureContributions.length > 0 ? (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={{ border: '1px solid black', padding: '8px' }}>Feature ID</th>
-                <th style={{ border: '1px solid black', padding: '8px' }}>Contribution</th>
-              </tr>
-            </thead>
-            <tbody>
-              {featureContributions.map((feature, index) => (
-                <tr key={index}>
-                  <td style={{ border: '1px solid black', padding: '8px' }}><strong>{feature.featureId}</strong></td>
-                  <td style={{ border: '1px solid black', padding: '8px' }}>{feature.contribution.toFixed(4)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>No contributions available.</p>
-        )}
       </>
     )}
   </div>

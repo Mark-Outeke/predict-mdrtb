@@ -6,6 +6,7 @@ import organisationUnits from 'mark/api/organisationUnits';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import Header from './Header'; // Adjust the path as necessary
 import Sidebar from './Sidebar'; // Adjust the path as necessary
+//import { PredictionComponent } from 'predictionProcessor'; // Import the prediction function
 
 
 
@@ -34,7 +35,6 @@ const TrackedEntitiesTable = (props) => {
       {
         details.ou = props.orgUnits.toString().replaceAll(',', ';');
         details.skipPaging = "true";
-
         return tracker.legacy.GetTrackedEntities(details)
 
       }else
@@ -43,22 +43,13 @@ const TrackedEntitiesTable = (props) => {
         return tracker.GetTrackedEntities(details)
       }
     }
-
-
-
-
     getTrackedEntities()
     .then((httpResponse)=>{
-
-      if(tracker.useLegacyTrackerApi)
-      {
+      if(tracker.useLegacyTrackerApi){
         setInstances(httpResponse.data.trackedEntityInstances);
-
-      }else
-      {
+      }else{
         setInstances(httpResponse.data.trackedEntities);
       }
-
     }).catch ((error) => {
       console.error("Error fetching data: ", error);
     }).finally(()=> {
@@ -83,10 +74,6 @@ const TrackedEntitiesTable = (props) => {
       
   }, [props.orgUnits, props.trackedEntityType, props.program]);
 
-
-  
-
-  
   // Prepare data for react-table from attributes
   const data = React.useMemo(() => (
     
@@ -96,9 +83,7 @@ const TrackedEntitiesTable = (props) => {
         attributesObject[attr.displayName] = attr.value; // Use displayName as key
       });
 
-
-
-      const getOrgUnitDisplayNameByID = (orgUnitID)=>{
+     const getOrgUnitDisplayNameByID = (orgUnitID)=>{
         for(const orgUnitDetail of orgUnitDetails)
         {
           if(orgUnitDetail.id === orgUnitID)
@@ -118,17 +103,7 @@ const TrackedEntitiesTable = (props) => {
     })
   ), [trackedEntities, orgUnitDetails]);
 
-
-
-
-
-
-
-
-
-
-
-  // Define columns based on displayNames dynamically
+// Define columns based on displayNames dynamically
   const columns = React.useMemo(() => {
     if (trackedEntities.length && trackedEntities[0].attributes) {
       const attributeColumns = trackedEntities[0].attributes.map(attr => ({
@@ -142,13 +117,6 @@ const TrackedEntitiesTable = (props) => {
     }
     return []; // Return empty if no trackedEntities available
   }, [trackedEntities]);
-
-
-
-
-
-
-
 
 
   // Use react-table with pagination
@@ -176,15 +144,7 @@ const TrackedEntitiesTable = (props) => {
     usePagination // Add usePagination to enable pagination
   );
 
-
-
-
-
-
-
-
-
-  // Render loading state
+// Render loading state
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -192,11 +152,12 @@ const TrackedEntitiesTable = (props) => {
   // Handle row click to navigate to InstanceDetails
   const handleRowClick = (row) => {
     console.log(trackedEntities[row.index]);
-    //const selectedInstance = trackedEntities[row.index];
+    const selectedInstance = trackedEntities[row.index];
+    //PredictionComponent(selectedInstance);
     //props.onEntitySelect(selectedInstance); // Pass the selected entity to the parent
-    navigate('/instanceDetails', {
+    navigate('/TrackedEntityDetails', {
       state: {
-        trackedEntity: trackedEntities[row.index]
+        trackedEntity: selectedInstance
       },
     });
   };

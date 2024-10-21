@@ -17,6 +17,7 @@ axios.defaults.headers.common['Accept'] = "application/json";
 
 const orgUnits = ["yApOnywci25", "Q6qNTXu3yRx","GuJvMV22ihs"];
 
+
 tracker.useLegacyTrackerApi = true;
 
 
@@ -31,9 +32,9 @@ const App = () => {
         <Routes>
           {/* Route to show TrackedEntitiesTable with data */}
           <Route path="/" element={<TrackedEntitiesTable orgUnits={orgUnits} trackedEntityType="MCPQUTHX1Ze" />} />
-          
           {/* Route for details page */}
-          <Route path="/instanceDetails/" element={<TrackedEntityDetails />} />
+          <Route path="/TrackedEntityDetails/" element={<TrackedEntityDetails />} />
+          {/* Route for prediction processor page */}
           <Route path="/predictionProcessor/" element={<PredictionComponent />} /> {/* Add prediction route */}
         </Routes>
       </Router>
