@@ -11,9 +11,12 @@ export const TrackedEntityProvider = ({ children }) => {
     if (newData.predictions) {
       setPredictionResult(newData.predictions);
     }
+    
+  
   };
   return (
-    <TrackedEntityContext.Provider value={{ trackedEntityData, setTrackedEntityData, predictionResult, setPredictionResult, updateTrackedEntity }}>
+    <TrackedEntityContext.Provider value={{ trackedEntityData, setTrackedEntityData,
+     predictionResult, setPredictionResult, updateTrackedEntity,  }}>
       {children}
     </TrackedEntityContext.Provider>
   );

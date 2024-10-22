@@ -6,17 +6,14 @@ import organisationUnits from 'mark/api/organisationUnits';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import Header from './Header'; // Adjust the path as necessary
 import Sidebar from './Sidebar'; // Adjust the path as necessary
-//import { PredictionComponent } from 'predictionProcessor'; // Import the prediction function
-
-
-
-
+import { useTrackedEntity } from 'TrackedEntityContext';
 
 const TrackedEntitiesTable = (props) => {
 
   const [trackedEntities, setInstances] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [orgUnitDetails, setOrgUnitDetails] = useState([]);
+  const { updateTrackedEntity } = useTrackedEntity(); // use the context
  
   const navigate = useNavigate();
 
@@ -153,12 +150,11 @@ const TrackedEntitiesTable = (props) => {
   const handleRowClick = (row) => {
     console.log(trackedEntities[row.index]);
     const selectedInstance = trackedEntities[row.index];
+    updateTrackedEntity(selectedInstance);
     //PredictionComponent(selectedInstance);
     //props.onEntitySelect(selectedInstance); // Pass the selected entity to the parent
     navigate('/TrackedEntityDetails', {
-      state: {
-        trackedEntity: selectedInstance
-      },
+      state: {trackedEntity: selectedInstance},
     });
   };
 

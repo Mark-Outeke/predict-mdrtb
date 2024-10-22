@@ -3,6 +3,11 @@ import * as tf from '@tensorflow/tfjs';
 import { useTrackedEntity } from 'TrackedEntityContext'; // Import your existing context
 import tracker from 'mark/api/tracker';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Doughnut } from 'react-chartjs-2'; // Import Doughnut chart component
+import { Chart, registerables } from 'chart.js'; // Import Chart and registerables
+
+Chart.register(...registerables); // Register all necessary chart components
+
 
 
 
@@ -13,7 +18,7 @@ const PredictionComponent = () => {
   const [featureContributions, setFeatureContributions] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Track if predictions are running
   const [hasRunPredictions, setHasRunPredictions] = useState(false); // Track if predictions have been made
-  const [averagePrediction, setAveragePrediction] = useState([]);
+  //const [averagePrediction, setAveragePrediction] = useState([]);
   const [highestAveragePrediction, setHighestAveragePrediction] = useState([]);
   const [predictedClass, setPredictedClass] = useState('');
   const [dataElementDisplayNames, setDataElementDisplayNames] = useState({}); // Mapping of IDs to display names
@@ -398,7 +403,7 @@ const PredictionComponent = () => {
     setFinalAVerageIGValues(finalAveragedIGValues);
     setPredictions(predictions);
     setFeatureContributions(mappedIGValues);
-    setAveragePrediction(averagePrediction);
+    //setAveragePrediction(averagePrediction);
     setPredictedClass(predictedClass);
     setHighestAveragePrediction(highestAveragePrediction);
     setFeatureAttributions(featureAttributions); // Set the calculated feature attributions
@@ -432,8 +437,29 @@ useEffect(() => {
 }, [featureContributions, dataElementDisplayNames]); // Add dependencies
 const sortedAveragedIGValues = finalAveragedIGValues.sort((a, b) => b.contribution - a.contribution);
 
+
+const doughnutData = {
+  labels: ['Not Likely', 'Likely'],
+  datasets: [
+    {
+      data: [100 - highestAveragePrediction, highestAveragePrediction], // Assuming highestAveragePrediction is accessible
+      backgroundColor: ['#FF6384', '#36A2EB'],
+      hoverBackgroundColor: ['#FF6384', '#36A2EB']
+    }
+  ]
+};
+
+if (isLoading) {
+  return <div>Loading predictions...</div>;
+} else if (error) {
+  return <div style={{ color: 'red' }}>Error: {error}</div>;
+}
+
+
+
 return (
-  <div>
+  <div className="App_mainCenterCanva">
+    
     <h1>Predictions</h1>
     {isLoading ? (
       <p>Loading predictions...</p>
@@ -441,15 +467,33 @@ return (
       <p style={{ color: 'red' }}>{error}</p> // Display the error message
     ) : (
       <>
-        <p><strong>Average Prediction:</strong> {JSON.stringify(averagePrediction)}</p>
-        <p><strong>Final Prediction Probability:</strong> {highestAveragePrediction}</p>
-        <p><strong>Patient Likely to Develop MDRTB:</strong> {predictedClass}</p>
-
+         <div className="card mb-3 border">
+        <div className="card-body">
+          <h5 className="card-title">Prediction Overview</h5>
+          <div className='row'>
+          {/* Left column for the Doughnut chart */}
+          <div className="col-md-2 border">  
+          <div style={{width: '200px', height: '200px', margin: '0 auto' }}>
+          <Doughnut data={doughnutData} />
+          </div>
+          </div>
+          
+           {/* Right column for prediction details */}
+           <div className="col-md-2 border">
+          
+          <p><strong>Final Prediction Probability:</strong> {highestAveragePrediction}</p>
+          <p><strong>Patient Likely to Develop MDRTB:</strong> {predictedClass}</p>
+        </div>
+        </div>
+      </div>
+      </div>
         {/* Display the filtered integrated gradients values in a table */}
         {sortedAveragedIGValues.length > 0 && (
-          <div>
-            <h2>Filtered Integrated Gradients Values</h2>
-            <table className="table table-bordered table-striped">
+          <div style={{ overflowX: 'auto', display: 'inline-block' }}>
+            <h2>Feature/Data Element's contribution</h2>
+              <h4>(By Integrated Gradients Values)</h4>
+            <table className="table table-bordered table-striped"
+            style={{ width: 'auto', tableLayout: 'auto' }}>
               <thead>
                 <tr>
                   <th style={{ border: '1px solid black', padding: '8px' }}>Feature</th>
@@ -473,10 +517,10 @@ return (
         )}
 
         <h2>Predictions List</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: 'auto', tableLayout: 'auto' }}>
           <thead>
             <tr>
-              <th style={{ border: '1px solid black', padding: '8px' }}>Prediction Index</th>
+              <th style={{ border: '1px solid black', padding: '8px' }}>Prediction per Event</th>
               <th style={{ border: '1px solid black', padding: '8px' }}>Prediction Value</th>
             </tr>
           </thead>

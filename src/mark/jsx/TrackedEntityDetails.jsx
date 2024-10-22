@@ -5,6 +5,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTrackedEntity } from 'TrackedEntityContext';
 import Header from './Header';
 
+import PredictionComponent from 'predictionProcessor';
+
 // import visualization library here if needed (e.g., Chart.js, D3.js)
 
 const TrackedEntityDetails = () => {
@@ -18,9 +20,8 @@ const TrackedEntityDetails = () => {
   const [predictions, setPredictions] = useState('');
   const [baselineData, setBaselineData] = useState([]); // State for baseline data
   const [sortedAveragedIGValues, setSortedAveragedIGValues] = useState([]); // State for sorted IG values
-
   const { setTrackedEntityData, } = useTrackedEntity();
-  const { predictionResult } = useTrackedEntity(); 
+   
 
   // Fetch display names for data elements when the component mounts
   useEffect(() => {
@@ -172,20 +173,23 @@ const TrackedEntityDetails = () => {
       <div className="App_mainCenterCanva">
         <Header />
         <h1>Patient's Dashboard</h1>
+       
         
-        <button className="btn btn-primary mb-3" onClick={() => navigate('/predictionProcessor/')}>
-          Click to view MDRTB Prediction Score
-        </button>
+                { <button className="btn btn-primary mb-3" onClick={() => navigate('/predictionProcessor/')}>
+                 Click to view MDRTB Prediction Score
+                </button>
+                  }
         
+       
         {predictions && (
           <div className="alert alert-info">
             {predictions}</div>)}
 
-            {predictionResult && (
+            {/*predictionResult && (
         <div className="alert alert-info">
           Predictions: {JSON.stringify(predictionResult)}
         </div>
-      )}
+      )*/}
         
         {/* Visualization logic goes here */}
         {/* Example: You can pass 'details' to a chart component */}
@@ -223,12 +227,13 @@ const TrackedEntityDetails = () => {
             </div>
           </div>
         </div>
+        <PredictionComponent predictions={predictions}/>
         {/* Card for Baseline Data */}
-        <div className="card mb-3">
+        <div className="card mb-3" border >
           <div className="card-body">
             <h5 className="card-title">Baseline Data</h5>
             {baselineData.length > 0 ? (
-              <table className="table table-bordered table-striped">
+              <table className="table table-bordered table-striped" style={{ width: 'auto', tableLayout: 'auto' }}>
                 <thead>
                   <tr>
                     <th>Data Element</th>
@@ -236,6 +241,7 @@ const TrackedEntityDetails = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  
                   {baselineData.map((item, index) => (
                     <tr key={index}>
                       <td>{item.dataElement}</td>
@@ -254,7 +260,7 @@ const TrackedEntityDetails = () => {
           <h5 className="card-title">Filtered Integrated Gradients Values</h5>
           <h6>These explain the contribution by the features to the prediction for this patient</h6>
           {sortedAveragedIGValues.length > 0 ? (
-            <table className="table table-bordered table-striped">
+            <table className="table table-bordered table-striped" style={{ width: 'auto', tableLayout: 'auto' }}>
               <thead>
                 <tr>
                   <th>Data Element</th>
