@@ -5,20 +5,20 @@ import tracker from 'mark/api/tracker';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Doughnut } from 'react-chartjs-2'; // Import Doughnut chart component
 import { Chart, registerables } from 'chart.js'; // Import Chart and registerables
-
+import * as d3 from 'd3';
 Chart.register(...registerables); // Register all necessary chart components
 
 
 
 
-
+/* eslint-disable-next-line no-unused-vars */
 const PredictionComponent = () => {
   const { trackedEntityData, updateTrackedEntity } = useTrackedEntity(); // Get tracked entity data from context
   const [predictions, setPredictions] = useState([]);
   const [featureContributions, setFeatureContributions] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Track if predictions are running
   const [hasRunPredictions, setHasRunPredictions] = useState(false); // Track if predictions have been made
-  //const [averagePrediction, setAveragePrediction] = useState([]);
+  const [averagePrediction, setAveragePrediction] = useState([]);
   const [highestAveragePrediction, setHighestAveragePrediction] = useState([]);
   const [predictedClass, setPredictedClass] = useState('');
   const [dataElementDisplayNames, setDataElementDisplayNames] = useState({}); // Mapping of IDs to display names
@@ -27,9 +27,19 @@ const PredictionComponent = () => {
   //const [igValues, setIgValues] = useState([]);
   const [mappedIGValues, setMappedIGValues] = useState([]);
   const [finalAveragedIGValues, setFinalAVerageIGValues] = useState ([]);
+  const [isDisplayNamesFetched, setIsDisplayNamesFetched] = useState(false); // Track if display names have been fetched
+  
+
+  const silenceWarnings = (...args) => {};
+
+  useEffect(() => {
+    silenceWarnings(predictions, averagePrediction);
+  }, [predictions, averagePrediction]);
+
   
   useEffect(() => {
     const fetchDataElementDisplayNames = async () => {
+      if (!trackedEntityData) return;
       try {
         const response = await tracker.legacy.GetDataElementsNameByID({ 
           paging: false
@@ -46,7 +56,7 @@ const PredictionComponent = () => {
         });
   
         setDataElementDisplayNames(displayNameMapping); // Store the mapping in state
-        
+        setIsDisplayNamesFetched(true);
       } catch (error) {
         console.error('Error fetching data element display names:', error);
         setError('Failed to fetch data element display names');
@@ -54,11 +64,11 @@ const PredictionComponent = () => {
     };
   
     fetchDataElementDisplayNames();
-  }, []);
+  }, [trackedEntityData]);
   
   
    const runPrediction = useCallback(async () => {
-    if (!trackedEntityData || hasRunPredictions) return; // Ensure there's data before processing
+    if (!trackedEntityData ||!isDisplayNamesFetched|| hasRunPredictions) return; // Ensure there's data before processing
 
     // Use trackedEntityData from context
     const jsonData = trackedEntityData;
@@ -394,16 +404,18 @@ const PredictionComponent = () => {
     const highestPredictionIndex = averagePrediction.indexOf(Math.max(...averagePrediction));
     // Get the highest average prediction value
     const highestAveragePrediction = averagePrediction[highestPredictionIndex];
+    console.log('HAP', highestAveragePrediction)
     // Determine predicted class based on average prediction
     const predictedClass = highestAveragePrediction[0] > 0.5 ? 'YES' : 'NO';
     
     setPredictedClass(predictedClass)
+    console.log(predictions)
     console.log('Predicted Class:', predictedClass);
   
     setFinalAVerageIGValues(finalAveragedIGValues);
     setPredictions(predictions);
     setFeatureContributions(mappedIGValues);
-    //setAveragePrediction(averagePrediction);
+    setAveragePrediction(averagePrediction);
     setPredictedClass(predictedClass);
     setHighestAveragePrediction(highestAveragePrediction);
     setFeatureAttributions(featureAttributions); // Set the calculated feature attributions
@@ -412,7 +424,7 @@ const PredictionComponent = () => {
     setHasRunPredictions(true)
 
     }
-}, [trackedEntityData,hasRunPredictions,updateTrackedEntity,featureAttributions,mappedIGValues,dataElementDisplayNames]);
+}, [trackedEntityData,hasRunPredictions,isDisplayNamesFetched,updateTrackedEntity,featureAttributions,mappedIGValues,dataElementDisplayNames]);
 
    
 
@@ -435,17 +447,84 @@ useEffect(() => {
   );
    setMappedIGValues(mappedIGValues); // Store the mapped values
 }, [featureContributions, dataElementDisplayNames]); // Add dependencies
-const sortedAveragedIGValues = finalAveragedIGValues.sort((a, b) => b.contribution - a.contribution);
 
+
+const sortedAveragedIGValues = finalAveragedIGValues.sort((a, b) => b.contribution - a.contribution);
+useEffect(() => {
+  if (sortedAveragedIGValues.length > 0) {
+    const svgWidth = 900;
+    const svgHeight = 1000;
+    const margin = { top: 20, right: 30, bottom: 40, left: 400 };
+
+    // Remove any existing svg before creating a new one
+    d3.select("#bar-chart").select("svg").remove();
+
+    const container = d3.select("#bar-chart")
+      .append("div")
+      .style("overflow-y", "auto") // Enable vertical scrolling
+      .style("max-height", "500px"); // Adjust max-height as necessary
+
+    const svg = container.append("svg")
+      .attr("viewBox", `0 0 ${svgWidth} ${svgHeight}`)
+      .attr("preserveAspectRatio", "xMidYMid meet") // Maintain aspect ratio
+      .style("width", "100%")
+      .style("height", "auto")
+      .style("border", "1px solid #000");
+
+    const x = d3.scaleLinear()
+      .domain([0, d3.max(sortedAveragedIGValues, d => d.contribution)]).nice()
+      .range([margin.left, svgWidth - margin.right]);
+
+    const y = d3.scaleBand()
+      .domain(sortedAveragedIGValues.map(d => d.featureId))
+      .range([margin.top, svgHeight - margin.bottom])
+      .padding(0.2);
+
+      const bottomAxis = d3.axisBottom(x)
+      .tickSize(10)
+      .tickPadding(5);
+
+    svg.append("g")
+      .attr("transform", `translate(0,${svgHeight - margin.bottom})`)
+      .call(bottomAxis);
+
+    // Adjust font size for the bottom axis labels
+    svg.selectAll(".tick text")
+      .style("font-size", "16px");
+
+      const leftAxis = d3.axisLeft(y)
+      .tickSize(10)
+      .tickPadding(5);
+
+    svg.append("g")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(leftAxis);
+
+    // Adjust font size for the left axis labels
+    svg.selectAll(".tick text") // Selecting all text in the left axis
+      .style("font-size", "16px");
+
+    svg.selectAll(".bar")
+      .data(sortedAveragedIGValues)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", margin.left)
+      .attr("y", d => y(d.featureId))
+      .attr("width", d => x(d.contribution) - margin.left)
+      .attr("height", y.bandwidth())
+      .attr("fill", "steelblue");
+  }
+}, [sortedAveragedIGValues]);
 
 const doughnutData = {
   labels: ['Not Likely', 'Likely'],
   datasets: [
-    {
-      data: [100 - highestAveragePrediction, highestAveragePrediction], // Assuming highestAveragePrediction is accessible
+    { 
+      data: [highestAveragePrediction, 1-highestAveragePrediction], // Assuming highestAveragePrediction is accessible
       backgroundColor: ['#FF6384', '#36A2EB'],
       hoverBackgroundColor: ['#FF6384', '#36A2EB']
     }
+   
   ]
 };
 
@@ -460,88 +539,89 @@ if (isLoading) {
 return (
   <div className="App_mainCenterCanva">
     
-    <h1>Predictions</h1>
+    
     {isLoading ? (
       <p>Loading predictions...</p>
     ) : error ? (
       <p style={{ color: 'red' }}>{error}</p> // Display the error message
     ) : (
       <>
-         <div className="card mb-3 border">
-        <div className="card-body">
-          <h5 className="card-title">Prediction Overview</h5>
-          <div className='row'>
-          {/* Left column for the Doughnut chart */}
-          <div className="col-md-2 border">  
-          <div style={{width: '200px', height: '200px', margin: '0 auto' }}>
-          <Doughnut data={doughnutData} />
+      
+      <div className="card mb-3" style={{ width: '100%', padding: '15px' }}>
+  <div className="card-body">
+    <h5 className="card-title">Prediction Overview</h5>
+
+    <div className="row">
+      {/* First Column: Doughnut Chart + Prediction Details */}
+      <div className="col-md-5">
+        {/* Row 1: Doughnut Chart */}
+        <div className="row mb-3">
+          <div className="col-12 d-flex justify-content-center">
+            <div style={{ width: '200px', height: '200px', background: '#f2f9f9' }}>
+              <Doughnut
+                data={doughnutData}
+                options={{
+                  plugins: {
+                    legend: {
+                      display: true,
+                      position: 'top',
+                      labels: {
+                        font: { size: 18, color: '#333', weight: 'bold' },
+                      },
+                    },
+                  },
+                  responsive: true,
+                  maintainAspectRatio: false,
+                }}
+                style={{ width: '200px', height: '200px' }}
+              />
+            </div>
           </div>
-          </div>
-          
-           {/* Right column for prediction details */}
-           <div className="col-md-2 border">
-          
-          <p><strong>Final Prediction Probability:</strong> {highestAveragePrediction}</p>
-          <p><strong>Patient Likely to Develop MDRTB:</strong> {predictedClass}</p>
         </div>
+
+        {/* Row 2: Prediction Details */}
+        <div className="row">
+          <div className="col-12">
+            <p className="card-text">
+              <strong>Final Prediction Probability:</strong> {highestAveragePrediction}
+            </p>
+            <p className="card-text">
+              Patient Likely to Develop MDRTB: <strong>{predictedClass}</strong>
+            </p>
+          </div>
         </div>
       </div>
-      </div>
-        {/* Display the filtered integrated gradients values in a table */}
+
+      {/* Second Column: Bar Chart for Contributing Factors */}
+      <div className="col-md-7">
         {sortedAveragedIGValues.length > 0 && (
-          <div style={{ overflowX: 'auto', display: 'inline-block' }}>
-            <h2>Feature/Data Element's contribution</h2>
-              <h4>(By Integrated Gradients Values)</h4>
-            <table className="table table-bordered table-striped"
-            style={{ width: 'auto', tableLayout: 'auto' }}>
-              <thead>
-                <tr>
-                  <th style={{ border: '1px solid black', padding: '8px' }}>Feature</th>
-                  <th style={{ border: '1px solid black', padding: '8px' }}>Contribution</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedAveragedIGValues.map((feature, index) => (
-                  <tr key={index}>
-                    <td style={{ border: '1px solid black', padding: '8px' }}>
-                      {feature.featureId || `Unknown Feature (ID: ${feature.featureId})`}
-                    </td>
-                    <td style={{ border: '1px solid black', padding: '8px' }}>
-                      {feature.contribution.toFixed(3)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{ paddingLeft: '10px' }}>
+            <div className="card-body">
+              <h5>Contributing Factors</h5>
+              <h6>(By Integrated Gradients Values)</h6>
+              <div
+                id="bar-chart"
+                style={{
+                  overflowY: 'auto',
+                  maxHeight: '400px',
+                  width: '100%',
+                  border: '1px solid #000',
+                  background: '#f2f9f9',
+                }}
+              >
+                {/* D3 bar chart will be rendered here */}
+              </div>
+            </div>
           </div>
         )}
-
-        <h2>Predictions List</h2>
-        <table style={{ width: 'auto', tableLayout: 'auto' }}>
-          <thead>
-            <tr>
-              <th style={{ border: '1px solid black', padding: '8px' }}>Prediction per Event</th>
-              <th style={{ border: '1px solid black', padding: '8px' }}>Prediction Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {predictions.length > 0 ? (
-              predictions.map((prediction, index) => (
-                <tr key={index}>
-                  <td style={{ border: '1px solid black', padding: '8px' }}>{index + 1}</td>
-                  <td style={{ border: '1px solid black', padding: '8px' }}>{prediction}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={2} style={{ border: '1px solid black', padding: '8px' }}>No predictions available.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </>
-    )}
+      </div>
+    </div>
   </div>
+</div>
+</>
+)}
+</div>
 );
+
 };
 export default PredictionComponent;

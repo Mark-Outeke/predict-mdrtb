@@ -19,13 +19,14 @@ const tracker = {
     GetEnrollments : async (details)=>{
         return axios.get('/api/tracker/enrollments', {params: details});
     },
+    GetOrganizationUnits : async (details)=>{
+        return axios.get('/api/tracker/organisationUnits', {params: details});
+    },
+    GetOrganizationUnitsGeoFeatures : async (details)=>{
+        return axios.get('/api/tracker/geoFeatures', {params: details});
+    },
 
 
-
-
-
-
-    
     legacy : {
         GetTrackedEntities : async (details)=>{
             return axios.get(`/api/trackedEntityInstances`, {params: details});
@@ -44,7 +45,17 @@ const tracker = {
         },
         GetDataElementsNameByID : async (details)=>{
             return axios.get ('/api/dataElements', {params:details});
-        }
+        },
+        GetOrganizationUnits : async (details)=>{
+            return axios.get('/api/organisationUnits', {params:details});
+        },
+        GetOrganizationUnitsGeoFeatures : async (ou)=>{
+            const params = {
+                ou: ou
+            };
+            return axios.get('/api/geoFeatures', {params: params});
+        },
+    
     },
 
 
