@@ -11,6 +11,7 @@ import { MapContainer, TileLayer, Marker, Popup, GeoJSON, Circle } from 'react-l
 import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 import L from 'leaflet';
 import personIcon from './person.png';
+import HotspotProcessor from './HotspotData';
 
 
 
@@ -45,7 +46,14 @@ const TrackedEntityDetails = () => {
   const [currentOrgUnit, setCurrentOrgUnit] = useState(null);
   const [matchedOrgUnitGeofeature, setMatchedOrgUnitGeofeature] = useState(null);
   const [gisCoordinates, setGisCoordinates] = useState(null); // State for GIS coordinates
-  const [hotspotsData, setHotspotsData] = useState([]); // State for hotspots data
+  //const [hotspots, setHotspotsData] = useState([]); // State for hotspots data
+  const [distanceToOrgUnit, setDistanceToOrgUnit] = useState(null);
+  //const [distanceToHotspots, setDistanceToHotspots] = useState([]);
+ 
+
+  
+  const [hotspots, setHotspots] = useState([]);
+
 
 
   // Fetch display names for data elements when the component mounts
@@ -73,6 +81,10 @@ const TrackedEntityDetails = () => {
 
     fetchDataElementDisplayNames();
   }, []);
+
+
+
+
 
   // Fetch entity details
   useEffect(() => {
@@ -116,6 +128,7 @@ const TrackedEntityDetails = () => {
       });
     }
   }, [details]);
+  console.log('gisCoordinates', gisCoordinates);
 
   // Fetch predictions when entity details are loaded
   useEffect(() => {
@@ -166,6 +179,8 @@ const TrackedEntityDetails = () => {
     console.warn('No enrollments found in details:', details);
   }
   }, [details,dataElementDisplayNames]);
+
+
   useEffect(() => {
     if (details && details.enrollments && details.enrollments.length > 0) {
       const enrollment = details.enrollments[0]; // Get the first enrollment
@@ -435,23 +450,13 @@ const fetchDistrictsGeoJSON = async () => {
     console.error('Error fetching district GeoJSON:', error);
   }
 };
-const fetchHotspotsGeoJSON = async () => {
-  try {
-    const response = await fetch('/hotspots.geojson'); // Adjust to your hotspots file path
-    const geojsonHotspotsData = await response.json();
-    console.log('Fetched Hotspots Data:', geojsonHotspotsData);
-    setHotspotsData(geojsonHotspotsData);
-  } catch (error) {
-    console.error('Error fetching hotspots GeoJSON:', error);
-    console.log();
-  }
-};
+
 
 // Call fetch function within useEffect to run on component mount
 useEffect(() => {
 
   fetchDistrictsGeoJSON();
-  fetchHotspotsGeoJSON();
+  
 }, []);
 
 const mapRef = useRef ();
@@ -489,6 +494,50 @@ const patientIcon = L.icon({
   popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
 });
 
+
+
+const haversineDistance = (coords1, coords2) => {
+  const toRad = (value) => (value * Math.PI) / 180;
+  
+  const lat1 = coords1[0];
+  const lon1 = coords1[1];
+  const lat2 = coords2[0];
+  const lon2 = coords2[1];
+
+  const R = 6371; // Radius of the Earth in km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in kilometers
+};
+
+// Assuming you have gisCoordinates, currentOrgUnit, and hotspotsData already defined
+useEffect(() => {
+  console.log('Current Org Unit:', matchedOrgUnitGeofeature);
+  if (gisCoordinates && matchedOrgUnitGeofeature) {
+    const orgUnitCoords = [
+      matchedOrgUnitGeofeature.latitude, 
+      matchedOrgUnitGeofeature.longitude];
+    const distance = haversineDistance(gisCoordinates, orgUnitCoords);
+    setDistanceToOrgUnit(distance);
+    console.log('orgunitcoords',orgUnitCoords);
+  }
+  
+}, [gisCoordinates, matchedOrgUnitGeofeature]);
+
+const handleHotspotsCalculated = (newhotspots) => {
+  // Handle the calculated hotspots
+  
+  setHotspots(newhotspots);
+  //console.log('Received Hotspots:', newhotspots);
+};
 
   if (isLoading) {
     return <div className="alert alert-info">Loading instance details...</div>;
@@ -633,6 +682,21 @@ const patientIcon = L.icon({
         </div>
         </div>
         </div>
+        
+<div className='row'>
+        <div className="distances-info" style={{ marginRight: '20px' }}>
+  <div className="card mb-3">
+    <div className="card-body">
+      {distanceToOrgUnit !== null && (
+        <h5 className="card-title">
+          Distance to TB Clinic: {distanceToOrgUnit} kms
+        </h5>
+      )}
+
+      
+    </div>
+  </div>
+</div>
 
         {/* Render map of Uganda */}
         <div className="card mb-3"style={{ width: 'auto', display: 'inline-block' }}>
@@ -652,8 +716,27 @@ const patientIcon = L.icon({
              <Marker position={gisCoordinates} icon={patientIcon}>
               </Marker>
             )}
-            
-            {/* Render district boundaries */}
+
+             {/* Mounting HotspotProcessor component */}
+             <HotspotProcessor 
+                    radius={1000} 
+                    onHotspotsCalculated={handleHotspotsCalculated} 
+                     
+            />
+
+        {/* Render Hotspots on the Map */}
+        {hotspots.map((circleCoordinates, index) => (
+        <Circle
+          key={index}
+          center={[circleCoordinates[0][1], circleCoordinates[0][0]]} // Extract the center coordinates
+          radius={50} // Set the radius for the circle, replace with dynamic radius if needed
+          color="red"
+          fillColor="red"
+          fillOpacity={0.4}
+        />
+      ))}
+
+                {/* Render district boundaries */}
             {districts && (
                 <GeoJSON
                   data={districts}
@@ -664,33 +747,15 @@ const patientIcon = L.icon({
                         setSelectedDistrict(feature.properties.name); // Set the selected district to highlight
                       }
                     });
+                    // Add popup to display district name
+                       layer.bindPopup(feature.properties.name); // Bind district name to popup
                   }}
                 />
               )}
-                {hotspotsData && hotspotsData.features.map(feature => {
-                    const isInSelectedDistrict = feature.properties.district === selectedDistrict;
-                    if (isInSelectedDistrict) {
-                      const coordinates = feature.geometry.coordinates[0][0];
-                      const radius = feature.properties.radius*1000;
-                      return (
-                        <Circle 
-                          key={feature.id}
-                          center={[coordinates[1], coordinates[0]]} 
-                          radius={radius} // example property containing radius
-                          color="blue"
-                          fillColor="blue"
-                          fillOpacity={0.3}
-                          className='blinking' // Add this class for the blinking effect
-                        >
-                          <Popup>
-                            Hotspot in District: {feature.properties.district}
-                          </Popup>
-                        </Circle>
-                      );
-                    }
-                    return null; // For other features
-                  })}
-
+               
+             
+      
+      {/* Other component content */}
 
               {matchedOrgUnitGeofeature &&(
                 <Marker key={currentOrgUnit.id} 
@@ -706,6 +771,8 @@ const patientIcon = L.icon({
                 </Marker>
               )}
             </MapContainer>
+            
+          </div>
           </div>
           </div>
           </div>
