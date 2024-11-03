@@ -7,11 +7,13 @@ import Header from './Header';
 import { Chart, registerables } from 'chart.js'; 
 import * as d3 from 'd3';
 import PredictionComponent from 'predictionProcessor';
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON, Circle } from 'react-leaflet'; // Import Leaflet components
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, } from 'react-leaflet'; // Import Leaflet components
 import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 import L from 'leaflet';
 import personIcon from './person.png';
 import HotspotProcessor from './HotspotData';
+import 'leaflet.heat'; // Import the heatmap plugin
+//import {HeatmapLayer} from 'react-leaflet-heatmap-layer-v3';
 
 
 
@@ -30,7 +32,7 @@ Chart.register(...registerables); // Register all necessary chart component
 const TrackedEntityDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { trackedEntity } = location.state;
+  const {trackedEntity} = location.state;
   const [details, setDetails] = useState(null); // Store details as an object
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,7 +40,7 @@ const TrackedEntityDetails = () => {
   const [predictions, setPredictions] = useState('');
   const [baselineData, setBaselineData] = useState([]); // State for baseline data
   const [sortedAveragedIGValues, setSortedAveragedIGValues] = useState([]); // State for sorted IG values
-  const { setTrackedEntityData, } = useTrackedEntity();
+  const {setTrackedEntityData} = useTrackedEntity();
   const [combinedData, setCombinedData] = useState([]); // State for combined weight, BMI, and MUAC data
   const [orgUnitDetails, setOrgUnitDetails] = useState([]); // State to store organization unit details
   const [districts, setDistricts] = useState([]); // State for district boundaries
@@ -46,14 +48,10 @@ const TrackedEntityDetails = () => {
   const [currentOrgUnit, setCurrentOrgUnit] = useState(null);
   const [matchedOrgUnitGeofeature, setMatchedOrgUnitGeofeature] = useState(null);
   const [gisCoordinates, setGisCoordinates] = useState(null); // State for GIS coordinates
-  //const [hotspots, setHotspotsData] = useState([]); // State for hotspots data
-  const [distanceToOrgUnit, setDistanceToOrgUnit] = useState(null);
-  //const [distanceToHotspots, setDistanceToHotspots] = useState([]);
  
-
+  const [distanceToOrgUnit, setDistanceToOrgUnit] = useState(null);
+  const [heatmapData, setHeatmapData] = useState([]);
   
-  const [hotspots, setHotspots] = useState([]);
-
 
 
   // Fetch display names for data elements when the component mounts
@@ -532,12 +530,25 @@ useEffect(() => {
   
 }, [gisCoordinates, matchedOrgUnitGeofeature]);
 
-const handleHotspotsCalculated = (newhotspots) => {
-  // Handle the calculated hotspots
-  
-  setHotspots(newhotspots);
-  //console.log('Received Hotspots:', newhotspots);
-};
+
+
+useEffect(() => {
+  if (heatmapData.length > 0 && mapRef.current) {
+    L.heatLayer(heatmapData, {
+      radius: 25,
+      blur: 15,
+      maxZoom: 17,
+      gradient: {
+        0.2: 'blue',
+        0.4: 'lime',
+        0.6: 'yellow',
+        0.8: 'orange',
+        1.0: 'red',
+      },
+    }).addTo(mapRef.current);
+  }
+}, [heatmapData]);
+
 
   if (isLoading) {
     return <div className="alert alert-info">Loading instance details...</div>;
@@ -711,30 +722,23 @@ const handleHotspotsCalculated = (newhotspots) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
+
+
+
+          {/* Render Heatmap */}
+          {/*heatmapData.length > 0 && (
+              <L.heatLayer positions={heatmapData} radius={25} blur={15} maxZoom={17} />
+            )*/}
             {/* Marker for the patient's location */}
             {gisCoordinates && (
              <Marker position={gisCoordinates} icon={patientIcon}>
               </Marker>
             )}
 
-             {/* Mounting HotspotProcessor component */}
-             <HotspotProcessor 
-                    radius={1000} 
-                    onHotspotsCalculated={handleHotspotsCalculated} 
-                     
-            />
-
+             
         {/* Render Hotspots on the Map */}
-        {hotspots.map((circleCoordinates, index) => (
-        <Circle
-          key={index}
-          center={[circleCoordinates[0][1], circleCoordinates[0][0]]} // Extract the center coordinates
-          radius={50} // Set the radius for the circle, replace with dynamic radius if needed
-          color="red"
-          fillColor="red"
-          fillOpacity={0.4}
-        />
-      ))}
+        {<HotspotProcessor  setHeatmapData={setHeatmapData} />}
+       
 
                 {/* Render district boundaries */}
             {districts && (
