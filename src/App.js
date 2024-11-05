@@ -7,6 +7,7 @@ import { TrackedEntityProvider } from 'TrackedEntityContext'; // Import the cont
 import TrackedEntitiesTable from 'mark/jsx/TrackedEntitiesTable';
 import TrackedEntityDetails from 'mark/jsx/TrackedEntityDetails';
 import PredictionComponent from 'predictionProcessor'; // Import the prediction component
+import PredictionModelDescription from 'mark/jsx/PredictionModelDescription'; // Import the new description
 import tracker from 'mark/api/tracker';
 
 
@@ -36,6 +37,8 @@ const App = () => {
           <Route path="/TrackedEntityDetails/" element={<TrackedEntityDetails />} />
           {/* Route for prediction processor page */}
           <Route path="/predictionProcessor/" element={<PredictionComponent />} /> {/* Add prediction route */}
+          {/* New route for predictionModelDescription*/}
+          <Route path="/predictionModelDescription/" element={<PredictionModelDescription />} />
         </Routes>
       </Router>
     </TrackedEntityProvider>

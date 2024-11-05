@@ -52,6 +52,7 @@ const TrackedEntitiesTable = (props) => {
         setIsLoading(false);
       });
 
+      
     const filter = 'id:in:[' + props.orgUnits.toString() + ']';
 
     organisationUnits
@@ -67,6 +68,7 @@ const TrackedEntitiesTable = (props) => {
         console.error('Error fetching data:', error);
       });
   }, [props.orgUnits, props.trackedEntityType, props.program]);
+
 
   useEffect(() => {
     if (!searchTerm) {

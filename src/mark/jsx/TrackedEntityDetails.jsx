@@ -51,6 +51,9 @@ const TrackedEntityDetails = () => {
  
   const [distanceToOrgUnit, setDistanceToOrgUnit] = useState(null);
   const [heatmapData, setHeatmapData] = useState([]);
+  const [testResults, setTestResults] = useState([]); 
+  const [parishes, setParishes] = useState(null); // State for parish GeoJSON
+  
   
 
 
@@ -143,7 +146,7 @@ const TrackedEntityDetails = () => {
             }
            } catch (error) {
           console.error('Error fetching predictions:', error);
-          setPredictions('Error fetching predictions.');
+          setPredictions('');
         }
       };
 
@@ -179,6 +182,10 @@ const TrackedEntityDetails = () => {
   }, [details,dataElementDisplayNames]);
 
 
+
+
+
+  
   useEffect(() => {
     if (details && details.enrollments && details.enrollments.length > 0) {
       const enrollment = details.enrollments[0]; // Get the first enrollment
@@ -231,11 +238,15 @@ const TrackedEntityDetails = () => {
     }
   }, [details, dataElementDisplayNames]);
 
+
+
+
+
   const LineChart = ({ data }) => {
     useEffect(() => {
       const filteredData = data.filter(d => d.weight !== null || d.bmi !== null || d.muac !== null);
-      const svgWidth = 1200;
-      const svgHeight = 800;
+      const svgWidth = 1000;
+      const svgHeight = 650;
       const margin = { top: 20, right: 30, bottom: 50, left: 50 };
   
       // Clear any existing SVG
@@ -336,16 +347,25 @@ const TrackedEntityDetails = () => {
           .attr("fill", "green");
       }
     });
-      
-      // Add legends
-      svg.append("text").attr("x", 650).attr("y", 30).text("Weight").attr("fill", "steelblue");
-      svg.append("text").attr("x", 650).attr("y", 50).text("BMI").attr("fill", "orange");
-      svg.append("text").attr("x", 650).attr("y", 70).text("MUAC").attr("fill", "green");
+      // Create the legend at the bottom
+    const legend = svg.append("g")
+    .attr("transform", `translate(${svgWidth / 2}, ${svgHeight - margin.bottom + 20})`); // Position it at the bottom
+
+      // Legend items
+    legend.append("rect").attr("x", -60).attr("y", 0).attr("width", 10).attr("height", 10).attr("fill", "steelblue");
+    legend.append("text").attr("x", -45).attr("y", 10).text("Weight").attr("fill", "steelblue");
+    
+    legend.append("rect").attr("x", 0).attr("y", 0).attr("width", 10).attr("height", 10).attr("fill", "orange");
+    legend.append("text").attr("x", 15).attr("y", 10).text("BMI").attr("fill", "orange");
+    
+    legend.append("rect").attr("x", 60).attr("y", 0).attr("width", 10).attr("height", 10).attr("fill", "green");
+    legend.append("text").attr("x", 75).attr("y", 10).text("MUAC").attr("fill", "green");
+
   
     }, [data]);
   
     return (
-      <div id="line-chart" style={{ marginBottom: '20px' }}></div>
+      <div id="line-chart" style={{ marginBottom: '20px',  }}></div>
     );
   };
   
@@ -374,6 +394,31 @@ const getSevereData = (details, dataElementDisplayNames) => {
 
   return severeEntries;
 };
+
+
+// Getting test results data from each event to monitor for improvement.
+
+useEffect(() => {
+  if (details && details.enrollments && details.enrollments.length > 0) {
+    const enrollment = details.enrollments[0]; // Get the first enrollment
+    if (enrollment.events && enrollment.events.length > 0) {
+      const results = [];
+
+      enrollment.events.forEach(event => {
+        event.dataValues.forEach(dataValue => {
+          if (dataValue.dataElement === 'WTz4HSqoE5E') { // Check for follow-up test data element
+            results.push({
+              eventDate: event.eventDate,
+              result: dataValue.value, // Store the test result
+            });
+          }
+        });
+      });
+
+      setTestResults(results);
+    }
+  }
+}, [details]);
 
 // Usage within your component
 useEffect(() => {
@@ -442,8 +487,8 @@ console.log('current orgUnit:', currentOrgUnit );
 const fetchDistrictsGeoJSON = async () => {
   try {
     const response = await fetch('/Districts_UG.geojson'); // Adjust path if needed
-    const geojsonData = await response.json();
-    setDistricts(geojsonData);
+    const DistrictGeoJsonData = await response.json();
+    setDistricts(DistrictGeoJsonData);
   } catch (error) {
     console.error('Error fetching district GeoJSON:', error);
   }
@@ -459,6 +504,19 @@ useEffect(() => {
 
 const mapRef = useRef ();
 
+useEffect(() => {
+  const fetchParishesGeoJSON = async () => {
+    try {
+      const response = await fetch('/Ug_Parishes_2016.geojson'); // Adjust the path
+      const ParishesGeoJsonData = await response.json();
+      setParishes(ParishesGeoJsonData);
+    } catch (error) {
+      console.error('Error fetching parish GeoJSON:', error);
+    }
+  };
+
+  fetchParishesGeoJSON();
+}, []);
 useEffect(() => {
   if (currentOrgUnit && orgUnitDetails.length > 0) {
     const matchedFeature = orgUnitDetails.find(unit => unit.id === currentOrgUnit.id);
@@ -487,7 +545,7 @@ const styleDistrict = (feature) => {
 };
 const patientIcon = L.icon({
   iconUrl: personIcon,
-  iconSize: [25, 41], // Size of the icon
+  iconSize: [25, 25], // Size of the icon
   iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
   popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
 });
@@ -594,196 +652,238 @@ useEffect(() => {
 
 
 
-    return (
-      <div className="App_mainCenterCanva">
-        <Header />
-        <h1>Patient's Dashboard</h1>
-       
-        
-                { <button className="btn btn-primary mb-3" onClick={() => navigate('/predictionProcessor/')}>
-                 Click to view MDRTB Prediction Score
-                </button>
-                  }
-        
-       
-        {predictions && (
-          <div className="alert alert-info">
-            {predictions}</div>)}
+  return (
+    <div className="App_mainCenterCanva" style={{ backgroundColor: '#f4f6f8' }}>
+      <Header />
+      <h1 style={{ fontFamily: 'Arial, sans-serif', fontSize: '30px', textAlign: 'center' }}>Patient's Dashboard</h1>
+      <div className="mb-3" style={{ textAlign: 'left' }}>
+    <button
+      className="btn"
+      style={{ backgroundColor: '#fff', color: 'black', border: '1px solid', borderRadius: '14px', padding: '10px 20px', fontSize: '16px' }}
+      onClick={() => navigate('/')} // Adjust the path to your trackedEntityTable component's route
+    >
+      Back
+    </button>
+  </div>
 
-            {/*predictionResult && (
-        <div className="alert alert-info">
-          Predictions: {JSON.stringify(predictionResult)}
-        </div>
-      )*/}
-        
-        {/* Visualization logic goes here */}
-        {/* Example: You can pass 'details' to a chart component */}
-        <div className="row mb-3">
-        <div className="col-sm-3">
-            <div className="card mb-3" >
-              <div className="card-body">
-                <h5 className="card-title">Patient Name</h5>
-                <p className="card-text"><strong>{patientName} {givenName} {familyName}</strong></p>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-2">
-            <div className="card mb-3" >
-              <div className="card-body">
-                <h5 className="card-title">Patient Age</h5>
-                <p className="card-text"><strong>{patientAge}</strong> years</p>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-2">
-            <div className="card mb-3">
-              <div className="card-body">
-                <h5 className="card-title">Patient Sex</h5>
-                <p className="card-text"><strong>{patientSex}</strong></p>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card mb-3">
-              <div className="card-body">
-                <h5 className="card-title">TB Registration Number</h5>
-                <p className="card-text"><strong>{tbRegistrationNumber}</strong></p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="row mb-3">
-          <div className="col-md-12">
-        <PredictionComponent predictions={predictions}/>
-        </div>
-        </div>
-
-        <div className="row mb-3 ">
-        {/* Card for Baseline Data */}
-        <div className="card mb-2 border"style={{ width: 'auto', display: 'inline-block' }} >
-          <div className="card-body">
-            <h5 className="card-title">Baseline Data</h5>
-            {baselineData.length > 0 ? (
-              <table className="table table-bordered table-striped" style={{ width: 'auto', tableLayout: 'auto', display: 'inline-block' }}>
-                <thead>
-                  <tr>
-                    <th>Data Element</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  
-                  {baselineData.map((item, index) => (
-                    <tr key={index}>
-                      <td style={{ fontSize: '20px' }}>{item.dataElement}</td>
-                      <td style={{ fontSize: '20px' }}>{item.value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p>No baseline data found.</p>
-            )}
-          </div>
-        </div>
-        <div className="card mb-8 border" >
-          <div className="card-body">
-            <h5 className="card-title"> Weight Monitoring per visit</h5>
-        <LineChart data={combinedData} />
-        </div>
-        </div>
-        </div>
-        
-<div className='row'>
-        <div className="distances-info" style={{ marginRight: '20px' }}>
-  <div className="card mb-3">
-    <div className="card-body">
-      {distanceToOrgUnit !== null && (
-        <h5 className="card-title">
-          Distance to TB Clinic: {distanceToOrgUnit} kms
-        </h5>
-      )}
-
-      
+      <div className="row">
+    <div className="col-md-12 d-flex justify-content-end mb-4">
+      <button className="btn btn-primary" 
+      style={{ backgroundColor: '#f4f6f8', color: 'black', border: '1px solid', borderRadius: '14px', padding: '10px 20px', fontSize: '16px' }}
+      onClick={() => navigate('/predictionProcessor/')}> {/* Button will be aligned to the right */}
+        Click to view MDRTB Prediction Score
+      </button>
     </div>
   </div>
-</div>
+  
+      {predictions && (
+        <div className="alert alert-info text-center">
+          {predictions}
+        </div>
+      )}
+  
+      <div className="row mb-3">
+        <div className="col-md-3">
+          <div className="card">
+            <div className="card-body text-center">
+              <h5 className="card-title">Patient Name</h5>
+              <p className="card-text"><strong>{patientName} {givenName} {familyName}</strong></p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-2">
+          <div className="card">
+            <div className="card-body text-center">
+              <h5 className="card-title">Patient Age</h5>
+              <p className="card-text"><strong>{patientAge}</strong> years</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-2">
+          <div className="card">
+            <div className="card-body text-center">
+              <h5 className="card-title">Patient Sex</h5>
+              <p className="card-text"><strong>{patientSex}</strong></p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="card">
+            <div className="card-body text-center">
+              <h5 className="card-title">TB Registration Number</h5>
+              <p className="card-text"><strong>{tbRegistrationNumber}</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div className="row mb-3">
+        <div className="col-md-12">
+          <PredictionComponent predictions={predictions} />
+        </div>
+      </div>
+  
+      <div className="row mb-3">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title text-center">Baseline Data</h5>
+              {baselineData.length > 0 ? (
+                <table className="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th>Data Element</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {baselineData.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.dataElement}</td>
+                        <td>{item.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-center">No baseline data found.</p>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title text-center">Weight Monitoring per Visit</h5>
+              <div style={{ overflow: 'auto' }}> 
+              <LineChart data={combinedData} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+            <div className="row mb-3">
+        <div className="col-md-12">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title text-center">Follow-Up Test Results</h5>
+              {testResults.length > 0 ? (
+                <table className="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Clinic Visit</th>
+                      {/* Generating column headers for each unique date */}
+                      {testResults.map((result, index) => {
+                        return (
+                          <th key={index}>
+                            {`Clinic Visit ${index + 1} (${new Date(result.eventDate).toLocaleDateString()})`}
+                          </th>
+                        );
+                      })}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Test Result</td>
+                      {/* Populating test results per visit */}
+                      {testResults.map((result, index) => (
+                        <td key={index}>{result.result}</td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-center">No follow-up test results found.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
-        {/* Render map of Uganda */}
-        <div className="card mb-3"style={{ width: 'auto', display: 'inline-block' }}>
-      <h5>Map Showing the Patient's location and proximity to Hotspots</h5>
-      <div className="map-container">
-        <MapContainer 
-          ref={mapRef}
-            center={[-1.3733, 32.2903]} 
-              zoom={15} 
-                style={{ height: '900px', width: '1000px' }}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
+      <div className="row">
+        <div className="col-md-12">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title text-center">Map Showing the Patient's Location and Proximity to Hotspots</h5>
+              <MapContainer
+                ref={mapRef}
+                center={
+                  gisCoordinates && matchedOrgUnitGeofeature
+                    ? [
+                        (gisCoordinates[0] + matchedOrgUnitGeofeature.latitude) / 2,
+                        (gisCoordinates[1] + matchedOrgUnitGeofeature.longitude) / 2,
+                      ]
+                    : [0.3411804, 32.5774869]
+                }
+                zoom={10}
+                style={{ height: '600px', width: '100%' }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                />
+                {gisCoordinates && <Marker position={gisCoordinates} icon={patientIcon} />}
+                <HotspotProcessor setHeatmapData={setHeatmapData} />
 
 
 
-          {/* Render Heatmap */}
-          {/*heatmapData.length > 0 && (
-              <L.heatLayer positions={heatmapData} radius={25} blur={15} maxZoom={17} />
-            )*/}
-            {/* Marker for the patient's location */}
-            {gisCoordinates && (
-             <Marker position={gisCoordinates} icon={patientIcon}>
-              </Marker>
-            )}
 
-             
-        {/* Render Hotspots on the Map */}
-        {<HotspotProcessor  setHeatmapData={setHeatmapData} />}
-       
+                {districts && (
+                  <GeoJSON
+                    data={districts}
+                    style={styleDistrict}
+                    onEachFeature={(feature, layer) => {
+                      layer.on({
+                        click: () => {
+                          setSelectedDistrict(feature.properties.name);
+                        },
+                      });
+                      layer.bindPopup(feature.properties.name);
+                    }}
+                  />
+                )}
+                {matchedOrgUnitGeofeature && (
+                  <Marker
+                    key={currentOrgUnit.id}
+                    position={[matchedOrgUnitGeofeature.latitude, matchedOrgUnitGeofeature.longitude]}
+                    icon={L.divIcon({
+                      className: 'org-unit-marker',
+                      html: `<div style="background-color: white; color:black; padding: 5px; border-radius: 5px; text-align:center;">TB Clinic</div>`,
+                      iconSize: [80, 20],
+                    })}
+                  >
+                    <Popup>{matchedOrgUnitGeofeature.displayName}</Popup>
+                  </Marker>
+                )}
 
-                {/* Render district boundaries */}
-            {districts && (
+            {parishes && (
                 <GeoJSON
-                  data={districts}
-                  style={styleDistrict}
+                  data={parishes}
+                  style={(feature) => ({
+                    color: "#ff7800", // Customize as needed
+                    weight: 2,
+                    opacity: 0.7,
+                    fillOpacity: 0,
+                  })}
                   onEachFeature={(feature, layer) => {
-                    layer.on({
-                      click: () => {
-                        setSelectedDistrict(feature.properties.name); // Set the selected district to highlight
-                      }
-                    });
-                    // Add popup to display district name
-                       layer.bindPopup(feature.properties.name); // Bind district name to popup
+                    layer.bindPopup(feature.properties.name); // Assuming the GeoJSON has a property 'name'
                   }}
                 />
               )}
-               
-             
-      
-      {/* Other component content */}
-
-              {matchedOrgUnitGeofeature &&(
-                <Marker key={currentOrgUnit.id} 
-                position={[matchedOrgUnitGeofeature.latitude, matchedOrgUnitGeofeature.longitude]}
-                icon={L.divIcon({
-                  className: 'org-unit-marker', 
-                  html: `<div style="background-color: white; color:black; padding: 5px; border-radius: 5px; text-align:center;">TB Clinic</div>`,
-                  iconSize: [80, 20]
-                })}>
-                  <Popup>
-                    {matchedOrgUnitGeofeature.displayName}
-                  </Popup>
-                </Marker>
+              </MapContainer>
+              {distanceToOrgUnit !== null && (
+                <div className="text-center mt-3">
+                  <h5>Distance to TB Clinic: {Math.round(distanceToOrgUnit * 100) / 100} kms</h5>
+                </div>
               )}
-            </MapContainer>
-            
+            </div>
           </div>
-          </div>
-          </div>
-          </div>
-
-        
-    );
-  }
-};
+        </div>
+      </div>
+    </div>
+  );
+}
+};  
 
 export default TrackedEntityDetails;

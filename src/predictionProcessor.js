@@ -537,7 +537,7 @@ if (isLoading) {
 
 
 return (
-  <div className="App_mainCenterCanva">
+  <div className="App_mainCenterCanva" style={{ backgroundColor: '#f4f6f8' }}>
     
     
     {isLoading ? (
@@ -583,7 +583,7 @@ return (
         <div className="row">
           <div className="col-12">
             <p className="card-text">
-              <strong>Final Prediction Probability:</strong> {highestAveragePrediction}
+              <strong>Final Prediction Probability:</strong> {Math.round(highestAveragePrediction * 1000) / 1000}
             </p>
             <p className="card-text">
               Patient Likely to Develop MDRTB: <strong>{predictedClass}</strong>
