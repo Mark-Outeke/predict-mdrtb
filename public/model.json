@@ -1,7 +1,7 @@
 {
   "format": "layers-model",
   "generatedBy": "keras v3.5.0",
-  "convertedBy": "TensorFlow.js Converter v4.21.0",
+  "convertedBy": "TensorFlow.js Converter v4.22.0",
   "modelTopology": {
     "keras_version": "3.5.0",
     "backend": "tensorflow",
@@ -20,7 +20,7 @@
           {
             "class_name": "InputLayer",
             "config": {
-              "input_shape": [null, 82],
+              "input_shape": [null, 48],
               "dtype": "float32",
               "sparse": false,
               "name": "input_layer"
@@ -133,7 +133,7 @@
                 "config": { "name": "float32" },
                 "registered_name": null
               },
-              "units": 2,
+              "units": 1,
               "activation": "sigmoid",
               "use_bias": true,
               "kernel_initializer": {
@@ -155,14 +155,14 @@
             }
           }
         ],
-        "build_input_shape": [null, 82]
+        "build_input_shape": [null, 48]
       }
     },
     "training_config": {
       "loss": {
-        "class_name": "CategoricalCrossentropy",
+        "class_name": "BinaryCrossentropy",
         "config": {
-          "name": "categorical_crossentropy",
+          "name": "binary_crossentropy",
           "reduction": "sum_over_batch_size",
           "from_logits": false,
           "label_smoothing": 0.0,
@@ -199,48 +199,44 @@
   },
   "weightsManifest": [
     {
-      "paths": ["weights.json"],
+      "paths": ["weights.bin"],
       "weights": [
         {
-          "name": "dense/kernel",  
-          "shape": [82, 128],  
+          "name": "dense/kernel",
+          "shape": [48, 128],
+          "dtype": "float32"
+        },
+        { "name": "dense/bias", 
+            "shape": [128], 
+            "dtype": "float32" },
+        {
+          "name": "dense_1/kernel",
+          "shape": [128, 64],
           "dtype": "float32"
         },
         {
-          "name": "dense/bias",  
-          "shape": [128],
-          "dtype": "float32"
-        },
-        {
-          "name": "dense_1/kernel",  
-          "shape": [128, 64],  
-          "dtype": "float32"
-        },
-        {
-          "name": "dense_1/bias",  
+          "name": "dense_1/bias",
           "shape": [64],
           "dtype": "float32"
         },
         {
-          "name": "dense_2/kernel",  
-          "shape": [64, 32],  
+          "name": "dense_2/kernel",
+          "shape": [64, 32],
           "dtype": "float32"
         },
         {
-          "name": "dense_2/bias",  
+          "name": "dense_2/bias",
           "shape": [32],
           "dtype": "float32"
         },
         {
-          "name": "dense_3/kernel", 
-          "shape": [32, 2],  
+          "name": "dense_3/kernel",
+          "shape": [32, 1],
           "dtype": "float32"
         },
-        {
-          "name": "dense_3/bias",  
-          "shape": [2],  
-          "dtype": "float32"
-        }
+        { "name": "dense_3/bias", 
+            "shape": [1], 
+            "dtype": "float32" }
       ]
     }
   ]

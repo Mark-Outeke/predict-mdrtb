@@ -13,7 +13,7 @@ import L from 'leaflet';
 import personIcon from './person.png';
 import HotspotProcessor from './HotspotData';
 import 'leaflet.heat'; // Import the heatmap plugin
-//import {HeatmapLayer} from 'react-leaflet-heatmap-layer-v3';
+
 
 
 
@@ -129,7 +129,7 @@ const TrackedEntityDetails = () => {
       });
     }
   }, [details]);
-  console.log('gisCoordinates', gisCoordinates);
+  //console.log('gisCoordinates', gisCoordinates);
 
   // Fetch predictions when entity details are loaded
   useEffect(() => {
@@ -154,6 +154,7 @@ const TrackedEntityDetails = () => {
     }
   }, [trackedEntity, sortedAveragedIGValues]);
 
+
   useEffect(() => {
     if (details && details.enrollments && details.enrollments.length > 0) {
       const enrollment = details.enrollments[0]; // Get the first enrollment
@@ -171,13 +172,13 @@ const TrackedEntityDetails = () => {
               });
             }
           });
-          console.log('Baseline entries found:', baselineEntries); // Log found entries
+          //console.log('Baseline entries found:', baselineEntries); // Log found entries
       setBaselineData(baselineEntries);
     } else {
-      console.warn('No events found in the first enrollment.');
+      //console.warn('No events found in the first enrollment.');
     }
   } else {
-    console.warn('No enrollments found in details:', details);
+    //console.warn('No enrollments found in details:', details);
   }
   }, [details,dataElementDisplayNames]);
 
@@ -229,7 +230,7 @@ const TrackedEntityDetails = () => {
         }));
   
         setCombinedData(combined); // Store combined data for visualization
-        console.log('Combined data for line chart:', combined); // For debugging
+        //console.log('Combined data for line chart:', combined); // For debugging
       } else {
         console.warn('No events found in the first enrollment.');
       }
@@ -465,7 +466,7 @@ useEffect(() => {
 
   fetchOrgUnitDetails();
 }, []);
-console.log(' fetched geo details',orgUnitDetails);
+//console.log(' fetched geo details',orgUnitDetails);
 
 
 
@@ -479,7 +480,7 @@ useEffect(() => {
     }
   } 
 }, [details, dataElementDisplayNames]);
-console.log('current orgUnit:', currentOrgUnit );
+//console.log('current orgUnit:', currentOrgUnit );
 
 //match currentorgunit with its geofeatures from the orgunitdetails
 
@@ -576,14 +577,14 @@ const haversineDistance = (coords1, coords2) => {
 
 // Assuming you have gisCoordinates, currentOrgUnit, and hotspotsData already defined
 useEffect(() => {
-  console.log('Current Org Unit:', matchedOrgUnitGeofeature);
+  //console.log('Current Org Unit:', matchedOrgUnitGeofeature);
   if (gisCoordinates && matchedOrgUnitGeofeature) {
     const orgUnitCoords = [
       matchedOrgUnitGeofeature.latitude, 
       matchedOrgUnitGeofeature.longitude];
     const distance = haversineDistance(gisCoordinates, orgUnitCoords);
     setDistanceToOrgUnit(distance);
-    console.log('orgunitcoords',orgUnitCoords);
+    //console.log('orgunitcoords',orgUnitCoords);
   }
   
 }, [gisCoordinates, matchedOrgUnitGeofeature]);
