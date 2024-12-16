@@ -1,9 +1,15 @@
 .sidebar {
-    width: 200px;
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-right: 1px solid #dee2e6;
-  }
+  position: fixed; /* Fix it to stay on the left */
+  top: 60px; /* Position it below the header */
+  left: 0;
+  width: 200px; /* Width of the sidebar */
+  height: calc(100vh - 60px); /* Full height minus header height */
+  overflow-y: auto; /* Allow vertical scrolling */
+  background-color: #f8f9fa; /* Sidebar background color */
+  padding: 15px;
+  border-right: 1px solid #dee2e6; /* Right border */
+}
+
   
   .sidebar h2 {
     margin: 0 0 15px;

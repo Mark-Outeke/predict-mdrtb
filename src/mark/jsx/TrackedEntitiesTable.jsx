@@ -6,7 +6,8 @@ import organisationUnits from 'mark/api/organisationUnits';
 import { useNavigate } from 'react-router-dom'; 
 import Header from './Header'; 
 import Sidebar from './Sidebar'; 
-import { useTrackedEntity } from 'TrackedEntityContext';
+import 'index.css'
+import { useTrackedEntity } from 'mark/jsx/TrackedEntityContext';
 
 const TrackedEntitiesTable = (props) => {
   const [trackedEntities, setInstances] = useState([]);
@@ -180,6 +181,17 @@ const columns = React.useMemo(() => [
     });
   };
 
+  const mainContentStyle = {
+    marginLeft: '200px', // Same as sidebar width
+    marginTop: '80px', // Same as header height
+    padding: '20px',
+    backgroundColor: '#f4f6f8',
+    height: 'calc(100vh - 80px)', // Adjust if you have a header of 80px
+    overflow: 'auto', // Allows scrolling
+  };
+  
+
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -188,7 +200,11 @@ const columns = React.useMemo(() => [
     <div className="App_mainCenterCanva">
       <Header />
       <div className="layout">
+      <div className="d-flex">
         <Sidebar />
+        <div style={mainContentStyle}>
+
+
         <div className="table-container">
           {/* Search Input */}
           <input
@@ -270,6 +286,8 @@ const columns = React.useMemo(() => [
           </div>
         </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 };

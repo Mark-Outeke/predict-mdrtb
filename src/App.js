@@ -3,10 +3,10 @@ import React from 'react';
 import axios from 'axios';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import { TrackedEntityProvider } from 'TrackedEntityContext'; // Import the context provider
+import { TrackedEntityProvider } from 'mark/jsx/TrackedEntityContext'; // Import the context provider
 import TrackedEntitiesTable from 'mark/jsx/TrackedEntitiesTable';
 import TrackedEntityDetails from 'mark/jsx/TrackedEntityDetails';
-import PredictionComponent from 'predictionProcessor'; // Import the prediction component
+import PredictionComponent from 'mark/jsx/predictionProcessor'; // Import the prediction component
 import PredictionModelDescription from 'mark/jsx/PredictionModelDescription'; // Import the new description
 import tracker from 'mark/api/tracker';
 

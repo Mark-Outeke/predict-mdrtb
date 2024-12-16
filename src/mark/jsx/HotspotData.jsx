@@ -51,7 +51,7 @@ const HotspotProcessor = ({ setHeatmapData  }) => {
       return null; // Return null if not found or parsing fails
     }).filter((coord) => coord !== null); // Filter out invalid coordinates
   
-    console.log('Extracted Coordinates:', coordinates); // Print the extracted coordinates to the console
+    //console.log('Extracted Coordinates:', coordinates); // Print the extracted coordinates to the console
     return coordinates; // Return the filtered coordinates
   };
   
@@ -63,7 +63,7 @@ const HotspotProcessor = ({ setHeatmapData  }) => {
     
     // Set heatmap data in the parent component
     setHeatmapData(heatmapData);
-    console.log('Heatmap Data:', heatmapData); // Print the heatmap data to the console
+    //console.log('Heatmap Data:', heatmapData); // Print the heatmap data to the console
     // Clustering logic remains unchanged...
     const points = coordinates.map(coord => turf.point([coord.lng, coord.lat]));
     const featureCollection = turf.featureCollection(points);

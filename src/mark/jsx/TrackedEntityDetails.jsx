@@ -2,17 +2,21 @@ import React, { useEffect, useState, useRef } from 'react';
 import tracker from 'mark/api/tracker';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useTrackedEntity } from 'TrackedEntityContext';
+import { useTrackedEntity } from 'mark/jsx/TrackedEntityContext';
 import Header from './Header';
 import { Chart, registerables } from 'chart.js'; 
 import * as d3 from 'd3';
-import PredictionComponent from 'predictionProcessor';
+import Sidebar from './Sidebar'; 
+import 'App.css';
+import 'index.css';
+import PredictionComponent from 'mark/jsx/predictionProcessor';
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON, } from 'react-leaflet'; // Import Leaflet components
 import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 import L from 'leaflet';
 import personIcon from './person.png';
 import HotspotProcessor from './HotspotData';
 import 'leaflet.heat'; // Import the heatmap plugin
+import * as turf from '@turf/turf'; // Import turf for distance calculation
 
 
 
@@ -48,11 +52,14 @@ const TrackedEntityDetails = () => {
   const [currentOrgUnit, setCurrentOrgUnit] = useState(null);
   const [matchedOrgUnitGeofeature, setMatchedOrgUnitGeofeature] = useState(null);
   const [gisCoordinates, setGisCoordinates] = useState(null); // State for GIS coordinates
- 
   const [distanceToOrgUnit, setDistanceToOrgUnit] = useState(null);
   const [heatmapData, setHeatmapData] = useState([]);
   const [testResults, setTestResults] = useState([]); 
+  const [testTypes, setTestTypes] = useState([]); // State for test types
   const [parishes, setParishes] = useState(null); // State for parish GeoJSON
+  const [patientDistrict, setPatientDistrict] = useState(null);
+  const [patientParish, setPatientParish] = useState(null);
+  const [patientVillage, setPatientVillage] = useState(null);
   
   
 
@@ -404,6 +411,7 @@ useEffect(() => {
     const enrollment = details.enrollments[0]; // Get the first enrollment
     if (enrollment.events && enrollment.events.length > 0) {
       const results = [];
+      const types = [];
 
       enrollment.events.forEach(event => {
         event.dataValues.forEach(dataValue => {
@@ -412,14 +420,21 @@ useEffect(() => {
               eventDate: event.eventDate,
               result: dataValue.value, // Store the test result
             });
+          } else if (dataValue.dataElement === 't1wRW4bpRrj') { // Replace with actual test type data element ID
+            types.push({
+              eventDate: event.eventDate,
+              type: dataValue.value, // Store the type of test
+            });
           }
         });
       });
 
       setTestResults(results);
+      setTestTypes(types);
     }
   }
 }, [details]);
+
 
 // Usage within your component
 useEffect(() => {
@@ -485,19 +500,20 @@ useEffect(() => {
 //match currentorgunit with its geofeatures from the orgunitdetails
 
 
-const fetchDistrictsGeoJSON = async () => {
-  try {
-    const response = await fetch('/Districts_UG.geojson'); // Adjust path if needed
-    const DistrictGeoJsonData = await response.json();
-    setDistricts(DistrictGeoJsonData);
-  } catch (error) {
-    console.error('Error fetching district GeoJSON:', error);
-  }
-};
+
 
 
 // Call fetch function within useEffect to run on component mount
 useEffect(() => {
+  const fetchDistrictsGeoJSON = async () => {
+    try {
+      const response = await fetch('/Districts_UG.geojson'); // Adjust path if needed
+      const DistrictGeoJsonData = await response.json();
+      setDistricts(DistrictGeoJsonData);
+    } catch (error) {
+      console.error('Error fetching district GeoJSON:', error);
+    }
+  };
 
   fetchDistrictsGeoJSON();
   
@@ -518,6 +534,42 @@ useEffect(() => {
 
   fetchParishesGeoJSON();
 }, []);
+
+useEffect(() => {
+  // Function to check for the patient's district and parish
+  const checkPatientLocation = () => {
+    if (gisCoordinates && districts && parishes) {
+      const point = turf.point([gisCoordinates[1], gisCoordinates[0]]); // [lon, lat]
+      
+      // Check for district
+      let foundDistrict = null;
+      for (const feature of parishes.features) {
+        if (turf.booleanPointInPolygon(point, feature.geometry)) {
+          foundDistrict = feature.properties.D; // replace with the actual property for the district name
+          break;
+        }
+      }
+      
+      // Check for parish
+      let foundParish = null;
+      let foundVillage = null; // Replace with actual property for village if available
+      for (const feature of parishes.features) {
+        if (turf.booleanPointInPolygon(point, feature.geometry)) {
+          foundParish = feature.properties.P; // replace with actual property for parish name
+          foundVillage = feature.properties.V; // replace with actual property for village name
+          break;
+        }
+      }
+      
+      setPatientDistrict(foundDistrict);
+      setPatientParish(foundParish);
+      setPatientVillage(foundVillage);
+    }
+  };
+
+  checkPatientLocation();
+}, [gisCoordinates, districts, parishes]); // Dependencies to trigger the effect
+
 useEffect(() => {
   if (currentOrgUnit && orgUnitDetails.length > 0) {
     const matchedFeature = orgUnitDetails.find(unit => unit.id === currentOrgUnit.id);
@@ -528,7 +580,7 @@ useEffect(() => {
 useEffect(() => {
   if (matchedOrgUnitGeofeature && mapRef.current) {
     const { latitude, longitude } = matchedOrgUnitGeofeature;
-    mapRef.current.setView([latitude, longitude], 12); // Set zoom level as desired (e.g., 10)
+    mapRef.current.setView([latitude, longitude], 17); // Set zoom level as desired (e.g., 10)
   }
 }, [matchedOrgUnitGeofeature]);
 
@@ -651,26 +703,104 @@ useEffect(() => {
     console.error('No enrollments found in details:', details);
   };
 
+// Inline styles for main content
+const mainContentStyle = {
+  marginLeft: '250px', // Same as sidebar width
+  padding: '20px',
+  backgroundColor: '#f4f6f8',
+  height: 'calc(100vh - 80px)', // Adjust if you have a header of 80px
+  overflow: 'auto', // Allows scrolling
+};
+const MapLegend = () => {
+  const patientIconUrl = personIcon;
+  return (
+    <div style={{
+      position: 'absolute',
+      bottom: '50px',
+      left: '10px',
+      backgroundColor: 'white',
+      padding: '10px',
+      borderRadius: '5px',
+      boxShadow: '0 1px 5px rgba(0,0,0,0.65)',
+      zIndex: 1000
+    }}>
+      <h5>Map Legend</h5>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <img src={patientIconUrl} alt="Patient Icon" style={{ width: '20px', height: '20px', marginRight: '5px' }} />
+        <div style={{
+          width: '15px',
+          height: '15px',
+          backgroundColor: 'steelblue',
+          marginRight: '5px'
+        }}></div>
+        <span>Patient Icon</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          width: '15px',
+          height: '15px',
+          backgroundColor: '',
+          marginRight: '5px'
+        }}></div>
+        <span>Parish Boundaries</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          width: '15px',
+          height: '15px',
+          backgroundColor: 'green', // For low intensity
+          marginRight: '5px'
+        }}></div>
+        <span>Low Hotspot Intensity</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          width: '15px',
+          height: '15px',
+          backgroundColor: 'orange', // For medium intensity
+          marginRight: '5px'
+        }}></div>
+        <span>Medium Hotspot Intensity</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          width: '15px',
+          height: '15px',
+          backgroundColor: 'red', // For high intensity
+          marginRight: '5px'
+        }}></div>
+        <span>High Hotspot Intensity</span>
+      </div>
+    </div>
+  );
+};
+
+
+
+
 
 
   return (
     <div className="App_mainCenterCanva" style={{ backgroundColor: '#f4f6f8' }}>
       <Header />
+      <div className="layout">
+      <div className="d-flex">
+          <Sidebar /> {/* Add the Sidebar component here */}
+          <div style={mainContentStyle}>
+          
       <h1 style={{ fontFamily: 'Arial, sans-serif', fontSize: '30px', textAlign: 'center' }}>Patient's Dashboard</h1>
       <div className="mb-3" style={{ textAlign: 'left' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
     <button
       className="btn"
-      style={{ backgroundColor: '#fff', color: 'black', border: '1px solid', borderRadius: '14px', padding: '10px 20px', fontSize: '16px' }}
+      style={{ backgroundColor: '#fff', color: 'black', border: '1px solid rgb(209, 213, 219)', borderRadius: '14px', padding: '10px 20px', fontSize: '16px' }}
       onClick={() => navigate('/')} // Adjust the path to your trackedEntityTable component's route
     >
       Back
     </button>
-  </div>
-
-      <div className="row">
-    <div className="col-md-12 d-flex justify-content-end mb-4">
+  
       <button className="btn btn-primary" 
-      style={{ backgroundColor: '#f4f6f8', color: 'black', border: '1px solid', borderRadius: '14px', padding: '10px 20px', fontSize: '16px' }}
+      style={{ backgroundColor: '#f4f6f8', color: 'black', border: '1px solid rgb(209, 213, 219)', borderRadius: '14px', padding: '10px 20px', fontSize: '16px' }}
       onClick={() => navigate('/predictionProcessor/')}> {/* Button will be aligned to the right */}
         Click to view MDRTB Prediction Score
       </button>
@@ -792,6 +922,14 @@ useEffect(() => {
                         <td key={index}>{result.result}</td>
                       ))}
                     </tr>
+                    <tr>
+                      <td>Type of Test</td>
+                      {testResults.map((result, index) => (
+                        <td key={index}>{testTypes[index]?.type || 'N/A'}</td> 
+                      ))}
+                      </tr>
+
+
                   </tbody>
                 </table>
               ) : (
@@ -817,7 +955,7 @@ useEffect(() => {
                       ]
                     : [0.3411804, 32.5774869]
                 }
-                zoom={10}
+                zoom={13}
                 style={{ height: '600px', width: '100%' }}
               >
                 <TileLayer
@@ -826,8 +964,29 @@ useEffect(() => {
                 />
                 {gisCoordinates && <Marker position={gisCoordinates} icon={patientIcon} />}
                 <HotspotProcessor setHeatmapData={setHeatmapData} />
+                
+                {patientDistrict && (
+                  <div>
+                    <h5>District: {patientDistrict}</h5>
+                    <h5>Parish: {patientParish}</h5>
+                    <h5>Village: {patientVillage}</h5>
+                  </div>
+                )}
 
-
+                {parishes && (
+                <GeoJSON
+                  data={parishes}
+                  style={(feature) => ({
+                    color: "#8475a1", // Customize as needed
+                    weight: 2,
+                    opacity: 0.7,
+                    fillOpacity: 0,
+                  })}
+                  onEachFeature={(feature, layer) => {
+                    layer.bindPopup(feature.properties.name); // Assuming the GeoJSON has a property 'name'
+                  }}
+                />
+              )}
 
 
                 {districts && (
@@ -858,24 +1017,16 @@ useEffect(() => {
                   </Marker>
                 )}
 
-            {parishes && (
-                <GeoJSON
-                  data={parishes}
-                  style={(feature) => ({
-                    color: "#ff7800", // Customize as needed
-                    weight: 2,
-                    opacity: 0.7,
-                    fillOpacity: 0,
-                  })}
-                  onEachFeature={(feature, layer) => {
-                    layer.bindPopup(feature.properties.name); // Assuming the GeoJSON has a property 'name'
-                  }}
-                />
-              )}
+              <MapLegend /> 
               </MapContainer>
               {distanceToOrgUnit !== null && (
                 <div className="text-center mt-3">
                   <h5>Distance to TB Clinic: {Math.round(distanceToOrgUnit * 100) / 100} kms</h5>
+                  <div>
+                      <h5>Patient's District: {patientDistrict}</h5>
+                      <h5>Patient's Parish: {patientParish}</h5>
+                      <h5>Patient's Village: {patientVillage}</h5>
+                    </div>
                 </div>
               )}
             </div>
@@ -883,6 +1034,10 @@ useEffect(() => {
         </div>
       </div>
     </div>
+    </div>
+    </div>
+    </div>
+    
   );
 }
 };  

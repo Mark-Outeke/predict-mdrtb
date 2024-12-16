@@ -1,4 +1,6 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faComments, faEnvelope, faTh, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import './Header.css';
 
 const Header = () => {
@@ -28,13 +30,26 @@ const Header = () => {
           </svg>
           <h1 className="header-title">Predict MDR-TB</h1>
         </div>
+
         <nav>
           <ul>
-            <li><a href="/">xxx</a></li>
-            <li><a href="/about">xxx</a></li>
-            <li><a href="/contact">xxx</a></li>
+            <li><a href="/">.</a></li>
+            <li><a href="/about">.</a></li>
+            <li><a href="/contact">.</a></li>
           </ul>
         </nav>
+
+        {/* Online Status and Icons */}
+        <div className="header-icons">
+          <div className="online-status">
+            <span className="status-indicator">●</span>
+            <span>Online</span>
+          </div>
+          <FontAwesomeIcon icon={faComments} className="header-icon" />
+          <FontAwesomeIcon icon={faEnvelope} className="header-icon" />
+          <FontAwesomeIcon icon={faTh} className="header-icon" />
+          <FontAwesomeIcon icon={faUserCircle} className="header-icon" />
+        </div>
       </div>
     </header>
   );

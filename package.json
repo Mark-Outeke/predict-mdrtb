@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.7.1",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@react-leaflet/core": "^2.1.0",
     "@tensorflow/tfjs": "^4.21.0",
     "@tensorflow/tfjs-vis": "^1.5.1",
@@ -72,6 +74,5 @@
   },
   "devDependencies": {
     "@types/lime-js": "^0.0.33"
-    
   }
 }

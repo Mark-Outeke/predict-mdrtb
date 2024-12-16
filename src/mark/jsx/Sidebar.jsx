@@ -12,7 +12,7 @@ const Sidebar = () => {
         
         <li><a href="/link3">Model Explanantions</a></li>
 
-        <li><a href="/link2">Appointments</a></li>
+        
       </ul>
     </aside>
   );
