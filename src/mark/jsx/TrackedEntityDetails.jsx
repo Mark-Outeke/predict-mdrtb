@@ -629,14 +629,14 @@ const haversineDistance = (coords1, coords2) => {
 
 // Assuming you have gisCoordinates, currentOrgUnit, and hotspotsData already defined
 useEffect(() => {
-  //console.log('Current Org Unit:', matchedOrgUnitGeofeature);
+  
   if (gisCoordinates && matchedOrgUnitGeofeature) {
     const orgUnitCoords = [
       matchedOrgUnitGeofeature.latitude, 
       matchedOrgUnitGeofeature.longitude];
     const distance = haversineDistance(gisCoordinates, orgUnitCoords);
     setDistanceToOrgUnit(distance);
-    //console.log('orgunitcoords',orgUnitCoords);
+   
   }
   
 }, [gisCoordinates, matchedOrgUnitGeofeature]);

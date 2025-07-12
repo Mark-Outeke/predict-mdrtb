@@ -147,18 +147,18 @@ const numericColumns = ['Ghsh3wqVTif', 'xcTT5oXggBZ', 'WBsNDNQUgeX',
     processedData.push({ event: eventName, data: eventProcessedData });
    
     });
-    console.log('original Processed Data:', processedData);
+    //console.log('original Processed Data:', processedData);
      // Log the processedData
-    const clonedData = processedData.map(event => ({
-       event: event.event, data: event.data }));
-    console.log("Cloned Processed Data (Before Return):", clonedData);
+    //const clonedData = processedData.map(event => ({
+       //event: event.event, data: event.data }));
+    //console.log("Cloned Processed Data (Before Return):", clonedData);
    
     return  processedData;  
     };
     
     // Extract data elements from jsonData
     const processedDataArray = extractDataElements(jsonData, categoricalColumns);
-    console.log('Processed Data Array:', processedDataArray);
+    //console.log('Processed Data Array:', processedDataArray);
     
     const loadLabelEncoders = async () => {
       const response = await fetch('/label_encoders.json');
@@ -198,7 +198,7 @@ const numericColumns = ['Ghsh3wqVTif', 'xcTT5oXggBZ', 'WBsNDNQUgeX',
         return { ...row, data: Object.fromEntries(newData) }; // Spread to create a new object
       });
       
-      console.log('Final Encoded Data:', encodedData);
+      //console.log('Final Encoded Data:', encodedData);
       return encodedData; // Return the encoded data
   };
   const encodedData = await labelEncode(processedDataArray, categoricalColumns);
@@ -242,7 +242,7 @@ const scaleNumericData = async (data, numericColumns) => {
 
   // Apply scaling and missing value handling
     const scaledData = await scaleNumericData(encodedData, numericColumns);
-console.log('Scaled Data:', scaledData);
+  //console.log('Scaled Data:', scaledData);
 
     // Handle missing values
     const handleMissingValues = (data) => {
@@ -265,10 +265,13 @@ console.log('Scaled Data:', scaledData);
       };
     //console.log('finalData:', finalData);
 
+    //Extract feature names from final data and store them.
+
     const featureNames = Object.keys(finalData[0].data);
+
       // Assuming finalData is available and processed
       const tensorInputs = extractTensorInputs(finalData);
-      console.log('tensorInputs:', tensorInputs);
+      //console.log('tensorInputs:', tensorInputs);
 
       const loadModel = async () => {
         try {
@@ -287,7 +290,7 @@ console.log('Scaled Data:', scaledData);
       // Load TensorFlow model
       const model = await loadModel();
       if (model) {
-          console.log('Running Predictions...');
+          //console.log('Running Predictions...');
         // Loop through each tensor input and make predictions
           const predictions = [];
           const allMappedIGValues =[]; //array to store all mapped IG values for averaging
@@ -298,8 +301,10 @@ console.log('Scaled Data:', scaledData);
             //console.log('reshaped prediction input:',reshapedInput);
             
             const outputTensor = model.predict(reshapedInput);
+            //console.log('outputTensor:',outputTensor);
               // Get the prediction for the current row 
             const predictionArray = outputTensor.arraySync(); // Extract array
+            //console.log('predictionArray:',predictionArray);
               // If your model is binary classification with two outputs
               // You may need to check the output shape
             const predictionValue = predictionArray[0]; // Get the first output class probabilities
@@ -318,14 +323,14 @@ console.log('Scaled Data:', scaledData);
         
             const interpolatedInputs = alphaValues.map(alpha => {
               reshapedIGInput.data().then(data => {
-                console.log('reshapedInput data:', data);
+                //console.log('reshapedInput data:', data);
                 if (data.some(value => isNaN(value))) {
                     console.error('reshapedIGInput contains NaN values.');
                 }
             });
             
             baseline.data().then(data => {
-                console.log('baseline data:', data);
+                //console.log('baseline data:', data);
                 if (data.some(value => isNaN(value))) {
                     console.error('baseline contains NaN values.');
                 }

@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@fortawesome/free-solid-svg-icons": "^6.7.1",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@react-leaflet/core": "^2.1.0",
     "@tensorflow/tfjs": "^4.21.0",
     "@tensorflow/tfjs-vis": "^1.5.1",
     "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^13.5.0",
     "@turf/turf": "^7.1.0",
     "axios": "^1.7.7",
@@ -43,9 +43,9 @@
     "react-table": "^7.8.0",
     "recharts": "^2.13.0",
     "scikit-learn": "^0.1.0",
+    "selenium-webdriver": "^4.31.0",
     "url": "^0.11.4",
-    "web-vitals": "^2.1.4",
-    "xgboost_node": "^0.2.5"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -73,6 +73,20 @@
     ]
   },
   "devDependencies": {
-    "@types/lime-js": "^0.0.33"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
+    "@testing-library/react": "^11.2.7",
+    "@types/lime-js": "^0.0.33",
+    "webdriver-manager": "^12.1.9"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[jt]sx?$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!axios|d3|internmap||d3-.*)"
+    ]
   }
 }

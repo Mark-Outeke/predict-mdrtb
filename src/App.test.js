@@ -1,26 +1,40 @@
-// App.test.js
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import App from './App'; // Assuming App.js is in the same directory
+import App from './App'; // Replace with your actual component
+import axios from 'axios';
 
-jest.mock('./api', () => ({
-  fetchDHIS2Instances: jest.fn(() => Promise.resolve([
-    { id: 1, attributes: { someAttribute: 'value' } },
-    { id: 2, attributes: { anotherAttribute: 'differentValue' } },
-  ])),
-  fetchPrediction: jest.fn((features) => Promise.resolve(0.75)), // Mock prediction logic
-}));
+jest.mock('axios');
 
 test('renders a table with instance data and predicted scores', async () => {
-  await render(<App />);
+  axios.get.mockImplementation((url) => {
+    if (url.includes('/organisationUnits')) {
+      return Promise.resolve({
+        data: {
+          organisationUnits: [
+            { id: '1', name: 'Org 1' },
+            { id: '2', name: 'Org 2' }
+          ]
+        }
+      });
+    }
 
-  // Assertions for instance data
-  const instanceRows = screen.getAllByRole('row');
-  expect(instanceRows.length).toBe(2); // Two instances mocked
+    if (url.includes('/trackedEntityInstances')) {
+      return Promise.resolve({
+        data: {
+          trackedEntityInstances: [
+            { id: 't1', attributes: [], enrollments: [] },
+            { id: 't2', attributes: [], enrollments: [] }
+          ]
+        }
+      });
+    }
 
-  // Assertions for scores (if applicable)
-  const scoreElements = screen.getAllByText(/Score/i); // Match text "Score" (case-insensitive)
-  expect(scoreElements.length).toBe(2); // Two scores for two instances
+    return Promise.reject(new Error('Unknown URL'));
+  });
 
-  // More specific assertions based on your data structure and expected output
+  render(<App />);
+
+  // Wait for the rows to appear
+  const instanceRows = await screen.findAllByRole('row');
+  expect(instanceRows.length).toBe(3); // 1 header + 2 data rows
 });
