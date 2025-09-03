@@ -3,23 +3,29 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 60px; /* Adjust height as necessary */
-  background-color:rgb(44, 102, 147); /* Header background color */
-  z-index: 1000; /* Ensure it's above other elements */
-  color: white; /* Text color */
-  padding: 10px; /* Padding */
-  padding-bottom: 20px;
+  height: 70px; /* Slightly taller for better proportions */
+  background: linear-gradient(135deg, rgb(44, 102, 147) 0%, rgb(63, 131, 191) 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  color: white;
+  padding: 15px 20px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
   
   .header-content {
     display: flex;
     justify-content: space-between;
-    align-items: right;
+    align-items: center;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
   }
   
   .header-content h1 {
     margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
   
   .header-content nav ul {
@@ -30,47 +36,116 @@
   }
   
   .header-content nav ul li {
-    margin: 0 10px;
+    margin: 0 15px;
+    transition: transform 0.2s ease;
+  }
+  
+  .header-content nav ul li:hover {
+    transform: translateY(-2px);
   }
   
   .header-content nav ul li a {
     color: white;
     text-decoration: none;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .header-content nav ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
   .logo-container {
     display: flex;
-    align-items: center; /* Ensure both the logo and text are centered */
-    margin-right: 10px /* Space between logo and title */
+    align-items: center;
+    margin-right: 20px;
+    transition: transform 0.3s ease;
+  }
+  
+  .logo-container:hover {
+    transform: scale(1.05);
   }
   
   .logo {
-    height: 40px; /* Adjust the height as needed */
-    margin-right: 10px;
+    height: 45px;
+    margin-right: 12px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: filter 0.3s ease;
   }
+  
+  .logo:hover {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  }
+  
   .header-title {
-    font-size: 1.5rem; /* Adjust text size */
+    font-size: 1.7rem;
     margin: 0;
+    background: linear-gradient(45deg, #ffffff, #e3f2fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   .header-icons {
     display: flex;
     align-items: center;
+    gap: 20px;
   }
   
   .online-status {
     display: flex;
     align-items: center;
-    color: #34D399; /* Green color for online status */
-    margin-right: 15px; /* Space between online indicator and icons */
+    color: #4ade80;
+    background-color: rgba(74, 222, 128, 0.1);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
   }
   
   .status-indicator {
-    margin-right: 5px; /* Space between the dot and the text */
+    margin-right: 6px;
+    animation: blink 1.5s infinite;
+  }
+  
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
   }
   
   .header-icon {
-    color: #ffffff; /* Icon color */
-    font-size: 20px; /* Icon size */
-    margin-left: 15px; /* Space between icons */
-    cursor: pointer; /* Change cursor to pointer on hover */
+    color: #ffffff;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .header-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-icon:active {
+    transform: translateY(0);
   }
   

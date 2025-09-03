@@ -3,12 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/core": "^7.28.3",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@popperjs/core": "^2.11.8",
     "@react-leaflet/core": "^2.1.0",
     "@tensorflow/tfjs": "^4.21.0",
+    "@tensorflow/tfjs-core": "^4.22.0",
     "@tensorflow/tfjs-vis": "^1.5.1",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/user-event": "^13.5.0",
     "@turf/turf": "^7.1.0",
@@ -43,7 +47,9 @@
     "react-table": "^7.8.0",
     "recharts": "^2.13.0",
     "scikit-learn": "^0.1.0",
+    "seedrandom": "^3.0.5",
     "selenium-webdriver": "^4.31.0",
+    "typescript": "^5.9.2",
     "url": "^0.11.4",
     "web-vitals": "^2.1.4"
   },
@@ -73,9 +79,11 @@
     ]
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.28.0",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
     "@testing-library/react": "^11.2.7",
     "@types/lime-js": "^0.0.33",
+    "eslint-config-react-app": "^7.0.1",
     "webdriver-manager": "^12.1.9"
   },
   "jest": {

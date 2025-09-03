@@ -1,5 +1,8 @@
 .App {
   text-align: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
 }
 
 .App-logo {
@@ -14,7 +17,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -22,10 +25,16 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .App-link {
   color: #61dafb;
+  transition: color 0.3s ease;
+}
+
+.App-link:hover {
+  color: #21a9dc;
 }
 
 @keyframes App-logo-spin {
@@ -37,30 +46,98 @@
   }
 }
 .card {
-  flex: 1; /* Allow cards to grow equally */
-  margin: 10px; /* Adjust space between items */
-  padding: 20px; /* Some padding for aesthetics */
-  border: 1px solid #ccc; /* Optional: Add border to cards */
-  border-radius: 4px; /* Optional: Rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+  flex: 1;
+  margin: 15px;
+  padding: 25px;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 #bar-chart {
-  overflow-y: auto; /* Enable vertical scroll */
-  max-height: 500px; /* Set a maximum height for the scrollable area */
-  width: 600px; /* You can adjust this width according to your layout */
+  overflow-y: auto;
+  max-height: 600px;
+  width: 100%;
+  padding: 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+#bar-chart:hover {
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
 }
 .blinking {
-  animation: blinkingText 1s infinite;
+  animation: blinkingText 2s infinite;
 }
 
 @keyframes blinkingText {
-  0% { opacity: 1.0; }
-  50% { opacity: 0.0; }
-  100% { opacity: 1.0; }
+  0% { 
+    opacity: 1.0; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: scale(1.05);
+  }
+  100% { 
+    opacity: 1.0; 
+    transform: scale(1);
+  }
 }
+
 .main-content {
-  margin-left: 250px; /* Same as sidebar width */
-  padding: 20px;
-  background-color: #f4f6f8;
+  margin-left: 270px;
+  margin-top: 90px;
+  padding: 30px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: calc(100vh - 90px);
+  border-radius: 20px 0 0 0;
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
